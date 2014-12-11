@@ -34,7 +34,7 @@ public class Graph
      *
      * @return a collection of nodes. If there are no nodes an empty result is returned.
      */
-    public Iterable<Node> getNodes()
+    public Set<Node> getNodes()
     {
         return nodes;
     }
@@ -44,7 +44,7 @@ public class Graph
      *
      * @return a collection of relationships. If there are no nodes an empty result is returned.
      */
-    public Iterable<Relationship> getRelationships()
+    public Set<Relationship> getRelationships()
     {
         return relationships;
     }
