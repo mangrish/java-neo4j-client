@@ -6,17 +6,18 @@ A compact Java driver that supports Graphs natively for standalone Neo4J instanc
 # Background
 
 There are a few Java Neo4J Drivers out there, the two most used being the neo4j-rest-binding, a relic from the Neo4J 1.x
-days and the much news neo4j-jdbc-driver. The jdbc driver suffers from some major problems for some use cases:
+days and the much newer neo4j-jdbc-driver.
 
-1. It shoehorns the power of Neo4J's unique graph ability into a relational databases model. Compromising some of the
-pure power you get from graph querying.
-1. The Neo4J jdbc driver does also not support "graph" mode. Graph mode massively reducse the response payload and
-it allows users to store and retrieve object graphs, natively.
-1. It's not lightweight. I have to add a whole heap of dependencies just to make it work.
+As much as the jdbc driver is a big move forward, it suffers from some major issues:
 
-I wanted something that allows me to query Neo4J in form that makes it so powerful: the graph; but still have the ability
-to fall back on row querying when i needed it. This of this driver as the Java equivalent of of the Neo4j Web Browser and
-also has no other dependencies. Just like a driver should!
+1. It shoehorns the power of Neo4J's unique graph ability into a relational databases model which just doesn't fit that
+nicely with the Graph world.
+1. The Neo4J jdbc driver does also not support Neo4J's "graph" mode. Graph mode massively reduces the response payload and
+it allows users to store and retrieve object graphs, natively. This is so amazing but cannot be done with the JDBC driver AT ALL.
+1. It's not lightweight. Users get to add a tonne of dependencies that may conflict with their own dependencies.
+
+I wanted something that allows me to query Neo4J in the form that makes it so powerful: the graph; but still have the ability
+to fall back on row querying when i needed it. Think of this driver as the Java equivalent of of the Neo4j Web Browser.
 
 
 # Usage
@@ -44,28 +45,30 @@ results are available on the statements themselves.
 
 A typical usage might look like this:
 
+```java
+Neo4jClient client = new Neo4jClient("http://localhost:7474/db/data");
+
+Transaction transaction = client.getAtomicTransaction();
+
+Statement<Graph> statement1 = new GraphStatement("MATCH (n:Label{uuid:{uuid}})-[rels]-() RETURN n, rels")
+statement1.addParam("uuid", "abcd1234");
+
+Statement<RowSet> statement2 = new RowStatement("MATCH (n:Label) RETURN count(n)")
+
+transaction.add(statement1);
+transaction.add(statement2);
+
+transaction.commit();
+
+Graph graph = statement1.getResult(); // Do your Graph stuff here!
+
+RowSet rowSet = statement2.getResult();
+int count = rowSet.getInt(0); // you get the idea!
 ```
 
-    Neo4jClient client = new Neo4jClient("http://localhost:7474/db/data");
+In order to do Graph queries you will need to return relationships, not just the nodes!
 
-    Transaction transaction = client.getAtomicTransaction();
-
-    Statement<Graph> statement1 = new GraphStatement("MATCH (:Label{uuid:{uuid}})-[rels]-() RETURN rels")
-    statement1.addParam("uuid", "abcd1234");
-
-    Statement<RowSet> statement2 = new RowStatement("MATCH (n:Label) RETURN count(n)")
-
-    transaction.add(statement1);
-    transaction.add(statement2);
-
-    transaction.commit();
-
-    Graph graph = statement1.getResult(); // Do your Graph stuff here!
-
-    RowSet rowSet = statement2.getResult();
-    int count = rowSet.getInt(0); // you get the idea!
-
-```
+RowSets are just stripped down versions of the JDBC ResultSet. You can iterate through RowSets using the next() method.
 
 Just a note. I'm not happy with the Statement API and that will probably change to be more of a builder (e.g. new Statement(query).resultType(GRAPH).includeStats(true) etc.)
 
