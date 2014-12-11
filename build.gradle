@@ -1,33 +1,81 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+group = "io.innerloop"
+version = "0.1.1"
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-    dependencies {
-    }
-}
-
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'maven'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-version = 0.1
-
-repositories {
-    mavenCentral()
-}
-
-
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-//    compile group: '', name: '', version: ''
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
 }
 
 
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: System.getProperty('nexusUsername'), password: System.getProperty('nexusPassword'))
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: System.getProperty('nexusUsername'), password: System.getProperty('nexusPassword'))
+            }
+
+            pom.project {
+                name project.name
+                packaging 'jar'
+                description 'A compact Java driver that supports graph formats for standalone Neo4J instances.'
+                url 'https://github.com/inner-loop/java-neo4j-client'
+
+                scm {
+                    connection 'git@github.com:inner-loop/java-neo4j-client.git'
+                    developerConnection 'git@github.com:inner-loop/java-neo4j-client.git'
+                    url 'https://github.com/inner-loop/java-neo4j-client'
+                }
+
+                licenses {
+                    license {
+                        name 'GNU GENERAL PUBLIC LICENSE, Version 2.0'
+                        url 'http://www.gnu.org/licenses/gpl-2.0.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'mangrish'
+                        name 'Mark Angrish'
+                        email 'mark.angrish@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+}
 
