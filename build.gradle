@@ -1,0 +1,33 @@
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+version = 0.1
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+//    compile group: '', name: '', version: ''
+}
+
+
+
