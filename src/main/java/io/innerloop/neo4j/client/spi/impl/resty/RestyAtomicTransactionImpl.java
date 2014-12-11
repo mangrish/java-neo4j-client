@@ -4,7 +4,6 @@ import io.innerloop.neo4j.client.Neo4jClientException;
 import io.innerloop.neo4j.client.Neo4jClientMultiException;
 import io.innerloop.neo4j.client.Statement;
 import io.innerloop.neo4j.client.Transaction;
-import io.innerloop.neo4j.client.json.JSONArray;
 import io.innerloop.neo4j.client.json.JSONObject;
 import io.innerloop.neo4j.client.spi.impl.resty.web.JSONResource;
 import io.innerloop.neo4j.client.spi.impl.resty.web.Resty;

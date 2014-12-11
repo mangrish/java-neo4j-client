@@ -16,12 +16,13 @@ public class Graph
 
     /**
      * Creates a new Graph.
-     *
+     * <p>
      * <p>Note: Because this api's default implementation is known there is no safe constructor copying.
      *
-     * @param nodes The set of Nodes in this graph.
-     *
-     * @param relationships The set of Relationships in this Graph.
+     * @param nodes
+     *         The set of Nodes in this graph.
+     * @param relationships
+     *         The set of Relationships in this Graph.
      */
     public Graph(Set<Node> nodes, Set<Relationship> relationships)
     {

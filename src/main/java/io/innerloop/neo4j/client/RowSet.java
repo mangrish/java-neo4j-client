@@ -1,10 +1,11 @@
 package io.innerloop.neo4j.client;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by markangrish on 29/10/2014.
+ * A RowSet is similar to a JDBC ResultSet only it is very stripped down.
+ * <p>
+ * This object will be returned when making a Row based statement.
  */
 public class RowSet
 {
@@ -16,6 +17,14 @@ public class RowSet
 
     private int currentRow;
 
+    /**
+     * Creates a new RowSet with the specified column names and data.
+     *
+     * @param columnNames
+     *         The names of each column in the order they appear in the row data.
+     * @param rows
+     *         The rows of data that correlate to the column names.
+     */
     public RowSet(String[] columnNames, List<Object[]> rows)
     {
         this.columnNames = columnNames;
@@ -24,56 +33,129 @@ public class RowSet
         this.currentRow = 0;
     }
 
+    /**
+     * Determines if there is another row in the result set.
+     *
+     * @return true, if there is another row in this row set.
+     */
     public boolean next()
     {
         return totalRows > ++currentRow;
     }
 
+    /**
+     * Retrieves the column names in this result.
+     *
+     * @return The names of the columns in the order they appear in the row data.
+     */
     public String[] getColumnNames()
     {
-        return Arrays.copyOf(columnNames, columnNames.length);
+        return columnNames;
     }
 
+    /**
+     * Retrieves the value for a column in the current row as a String.
+     *
+     * @param column The column number to retrieve the value from.
+     *
+     * @return The value as a string in the specified column.
+     */
     public String getString(int column)
     {
         return (String) getRow(currentRow)[column];
     }
 
+    /**
+     * Retrieves the value for a column in the current row as an int.
+     *
+     * @param column The column number to retrieve the value from.
+     *
+     * @return The value as an int in the specified column.
+     */
     public int getInt(int column)
     {
         return (int) getRow(currentRow)[column];
     }
 
+    /**
+     * Retrieves the value for a column in the current row as a long.
+     *
+     * @param column The column number to retrieve the value from.
+     *
+     * @return The value as a long in the specified column.
+     */
     public long getLong(int column)
     {
         return (long) getRow(currentRow)[column];
     }
 
+    /**
+     * Retrieves the value for a column in the current row as a float.
+     *
+     * @param column The column number to retrieve the value from.
+     *
+     * @return The value as a float in the specified column.
+     */
     public float getFloat(int column)
     {
         return (float) getRow(currentRow)[column];
     }
 
+    /**
+     * Retrieves the value for a column in the current row as a double.
+     *
+     * @param column The column number to retrieve the value from.
+     *
+     * @return The value as a double in the specified column.
+     */
     public double getDouble(int column)
     {
         return (double) getRow(currentRow)[column];
     }
 
+    /**
+     * Retrieves the value for a column in the current row as a boolean.
+     *
+     * @param column The column number to retrieve the value from.
+     *
+     * @return The value as a boolean in the specified column.
+     */
     public boolean getBoolean(int column)
     {
         return (boolean) getRow(currentRow)[column];
     }
 
+    /**
+     * Retrieves the value for a column in the current row as a short.
+     *
+     * @param column The column number to retrieve the value from.
+     *
+     * @return The value as a short in the specified column.
+     */
     public short getShort(int column)
     {
         return (short) getRow(currentRow)[column];
     }
 
+    /**
+     * Retrieves the value for a column in the current row as a byte.
+     *
+     * @param column The column number to retrieve the value from.
+     *
+     * @return The value as a byte in the specified column.
+     */
     public byte getByte(int column)
     {
         return (byte) getRow(currentRow)[column];
     }
 
+    /**
+     * Retrieves the value for a column in the current row as a char.
+     *
+     * @param column The column number to retrieve the value from.
+     *
+     * @return The value as a char in the specified column.
+     */
     public char getChar(int column)
     {
         return (char) getRow(currentRow)[column];

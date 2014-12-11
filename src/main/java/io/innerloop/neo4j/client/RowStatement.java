@@ -1,7 +1,10 @@
 package io.innerloop.neo4j.client;
 
 /**
- * Created by markangrish on 11/12/2014.
+ * This is a statement that returns RowSets.
+ *
+ * @see io.innerloop.neo4j.client.RowSet
+ * @see io.innerloop.neo4j.client.Statement
  */
 public class RowStatement extends Statement<RowSet>
 {

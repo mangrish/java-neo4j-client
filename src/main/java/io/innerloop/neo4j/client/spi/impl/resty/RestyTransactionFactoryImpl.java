@@ -1,8 +1,8 @@
 package io.innerloop.neo4j.client.spi.impl.resty;
 
 import io.innerloop.neo4j.client.Transaction;
-import io.innerloop.neo4j.client.spi.impl.resty.web.Resty;
 import io.innerloop.neo4j.client.spi.TransactionFactory;
+import io.innerloop.neo4j.client.spi.impl.resty.web.Resty;
 
 /**
  * Created by markangrish on 11/12/2014.
@@ -33,6 +33,12 @@ public class RestyTransactionFactoryImpl implements TransactionFactory
     public Transaction createAtomicTransaction()
     {
         return new RestyAtomicTransactionImpl(client, autoCommitEndpointUrl);
+    }
+
+    @Override
+    public Transaction createLongTransaction()
+    {
+        throw new UnsupportedOperationException("Long Transactions not currently supported.");
     }
 
 }
