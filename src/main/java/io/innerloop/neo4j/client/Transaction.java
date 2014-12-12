@@ -29,17 +29,17 @@ public interface Transaction
      * is this transaction will be fully isolated until commit() is called. Calling Rollback will not roll back
      * statements to this point (like a savepoint) rather it will rollback the entire transaction.
      */
-    void flush();
+    void flush() throws Neo4jClientException;
 
     /**
      * Commits this Transaction to Neo4J. Right now commit() won't throw a checked exeption. This may change in future.
      */
-    void commit();
+    void commit() throws Neo4jClientException;
 
     /**
      * Rolls back any changes made by this Transaction.
      */
-    void rollback();
+    void rollback() throws Neo4jClientException;
 
     /**
      * Closes this Transaction. Allows any cleanup operation by the implementer to take place.

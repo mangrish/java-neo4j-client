@@ -6,7 +6,7 @@ package io.innerloop.neo4j.client;
  * <p> This is a RuntimeException as there is no reasonable corrective behaviour a program is expected to make when this
  * error occurs. </p>
  */
-public class Neo4jClientException extends RuntimeException
+public class Neo4jClientException extends Exception
 {
     private final String code;
 

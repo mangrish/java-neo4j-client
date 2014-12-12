@@ -80,7 +80,7 @@ public class RestyLongTransactionImpl implements Transaction
     }
 
     @Override
-    public void flush()
+    public void flush() throws Neo4jClientException
     {
         List<JSONObject> statements = this.statements.stream().map(Statement::toJson).collect(Collectors.toList());
         final JSONObject payload = new JSONObject().put("statements", (statements));
@@ -114,7 +114,7 @@ public class RestyLongTransactionImpl implements Transaction
     }
 
     @Override
-    public void commit()
+    public void commit() throws Neo4jClientException
     {
         List<JSONObject> statements = this.statements.stream().map(Statement::toJson).collect(Collectors.toList());
         final JSONObject payload = new JSONObject().put("statements", (statements));
@@ -144,7 +144,7 @@ public class RestyLongTransactionImpl implements Transaction
     }
 
     @Override
-    public void rollback()
+    public void rollback() throws Neo4jClientException
     {
         try
         {
@@ -164,7 +164,7 @@ public class RestyLongTransactionImpl implements Transaction
         closeTransaction();
     }
 
-    void checkErrors(Neo4jClientException[] exceptions)
+    void checkErrors(Neo4jClientException[] exceptions) throws Neo4jClientException
     {
         int length = exceptions.length;
 
