@@ -53,16 +53,12 @@ All Neo4J Queries must run within a Transaction and this driver gives you two op
 1. _Atomic Transactions_: Similar to JDBC "auto commit" Statements except you can add as many statements as you like to
 it. This is an all or nothing type transactions. Either all Statements succeed or none at all. No need to begin or
 rollback transactions.
-```java
-Transaction transaction = client.getAtomicTransaction();
-```
 1. _"Long" Transactions_: The classic database transaction model with one major difference: batches of statements can be
 flushed to the database intermittently before being committed. It also provides the capability to rollback Transactions.
-```java
-Transaction transaction = client.getLongTransaction();
-```
+
 
 Statements also come in two flavours:
+
 1. _Graph Statements_: Will return results in a graph format. Useful when you want to visualise your graph or map it to
 domain objects etc.
 1. _Row based Statements_: Will return results in a more JDBC familiar table format, with column names and rows of data.
@@ -104,6 +100,9 @@ Graph graph = statement.getResult(); // Do your Graph stuff here!
 And here is an example of using a Long Transaction:
 
 ```java
+Neo4jClient client = new Neo4jClient("http://localhost:7474/db/data");
+
+Transaction transaction = client.getLongTransaction(); // gets the active long transaction 
 try
 {
     transaction1.begin();
