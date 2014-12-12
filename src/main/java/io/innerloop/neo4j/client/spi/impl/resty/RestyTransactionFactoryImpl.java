@@ -15,12 +15,15 @@ public class RestyTransactionFactoryImpl implements TransactionFactory
 
     private final String autoCommitEndpointUrl;
 
+    private final String transactionEndpointUrl;
+
     public RestyTransactionFactoryImpl(String url)
     {
         this.client = new Resty();
         this.client.withHeader("X-Stream", "true");
         this.baseUrl = url.endsWith("/") ? url : url + "/";
         this.autoCommitEndpointUrl = this.baseUrl + "transaction/commit";
+        this.transactionEndpointUrl = this.baseUrl + "transaction";
     }
 
     public RestyTransactionFactoryImpl(String url, String userName, String password)
@@ -30,15 +33,15 @@ public class RestyTransactionFactoryImpl implements TransactionFactory
     }
 
     @Override
-    public Transaction createAtomicTransaction()
+    public Transaction getAtomicTransaction()
     {
         return new RestyAtomicTransactionImpl(client, autoCommitEndpointUrl);
     }
 
     @Override
-    public Transaction createLongTransaction()
+    public Transaction getLongTransaction()
     {
-        throw new UnsupportedOperationException("Long Transactions not currently supported.");
+        return RestyLongTransactionImpl.getTransaction(client, transactionEndpointUrl);
     }
 
 }

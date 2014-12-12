@@ -50,7 +50,7 @@ public class Neo4jClient
      */
     public Transaction getAtomicTransaction()
     {
-        return transactionFactory.createAtomicTransaction();
+        return transactionFactory.getAtomicTransaction();
     }
 
     /**
@@ -62,6 +62,6 @@ public class Neo4jClient
      */
     public Transaction getLongTransaction()
     {
-        return transactionFactory.createLongTransaction();
+        return transactionFactory.getLongTransaction();
     }
 }

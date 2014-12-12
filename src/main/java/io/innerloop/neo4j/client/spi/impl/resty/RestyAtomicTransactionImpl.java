@@ -46,6 +46,12 @@ public class RestyAtomicTransactionImpl implements Transaction
     }
 
     @Override
+    public void flush()
+    {
+        throw new UnsupportedOperationException("Long Transactions not currently supported by this driver.");
+    }
+
+    @Override
     public void commit()
     {
         List<JSONObject> statements = this.statements.stream().map(Statement::toJson).collect(Collectors.toList());
@@ -80,6 +86,12 @@ public class RestyAtomicTransactionImpl implements Transaction
     public void rollback()
     {
         this.statements.clear();
+    }
+
+    @Override
+    public void close()
+    {
+        //do nothing.
     }
 
     void checkErrors(Neo4jClientException[] exceptions)
