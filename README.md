@@ -16,6 +16,8 @@ A compact Java driver that supports Graphs natively for standalone Neo4J instanc
 
 ## Install
 
+This driver currently requires Java 8+.
+
 To install from Maven:
 
 ```maven
