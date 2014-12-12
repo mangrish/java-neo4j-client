@@ -17,10 +17,10 @@ import io.innerloop.neo4j.client.spi.impl.resty.web.jp.javacc.ParseException;
  * It uses dot '.' as a path separator and [] to access arrays.
  * The array index is either a number or an expression to evaluate for each object in the array. The first matching object is returned.
  * I.e. <p>
- * <code>store.book[price>7 && price<12.999].author</code>
+ * <code>store.book[price&lt;7 &amp;&amp; price&lt;12.999].author</code>
  * <p>
  * In the example above the JSON object with a prive value between 7 and 12.999 is selected and the author returned.
- * Boolean expressions are supported with && (and), || (or), ! (not). Values can be compared with =,<,>.
+ * Boolean expressions are supported with &amp;&amp; (and), || (or), ! (not). Values can be compared with =,&lt;,&gt;.
  *
  *
  * @author beders

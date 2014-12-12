@@ -15,7 +15,7 @@ import java.net.URI;
  * You can  ask Resty to parse the JSON into a JSONArray or a JSONObject. The JSONObject is similar to org.json.JSONObject
  * and allows full access to the JSON.
  * You can also access the JSON with a JSONPathQuery to extract only the parts you are interested in.
- * <p />
+ * <p>
  * @author beders
  * @author RobertFischer
  */

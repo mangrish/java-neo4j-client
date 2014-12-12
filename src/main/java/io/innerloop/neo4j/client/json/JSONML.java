@@ -246,7 +246,7 @@ public class JSONML {
      * attributes, then the second element will be JSONObject containing the
      * name/value pairs. If the tag contains children, then strings and
      * JSONArrays will represent the child tags.
-     * Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code> are ignored.
+     * Comments, prologs, DTDs, and <code>&lt;[ [ ]]&gt;</code> are ignored.
      * @param string The source string.
      * @return A JSONArray containing the structured data from the XML string.
      * @throws io.innerloop.neo4j.client.json.JSONException
@@ -264,7 +264,7 @@ public class JSONML {
      * attributes, then the second element will be JSONObject containing the
      * name/value pairs. If the tag contains children, then strings and
      * JSONArrays will represent the child content and tags.
-     * Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code> are ignored.
+     * Comments, prologs, DTDs, and <code>&lt;[ [ ]]&gt;</code> are ignored.
      * @param x An XMLTokener.
      * @return A JSONArray containing the structured data from the XML string.
      * @throws io.innerloop.neo4j.client.json.JSONException
@@ -283,7 +283,7 @@ public class JSONML {
      * contains children, the object will have a "childNodes" property which
      * will be an array of strings and JsonML JSONObjects.
 
-     * Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code> are ignored.
+     * Comments, prologs, DTDs, and <code>&lt;[ [ ]]&gt;</code> are ignored.
      * @param x An XMLTokener of the XML source text.
      * @return A JSONObject containing the structured data from the XML string.
      * @throws io.innerloop.neo4j.client.json.JSONException
@@ -302,7 +302,7 @@ public class JSONML {
      * contains children, the object will have a "childNodes" property which
      * will be an array of strings and JsonML JSONObjects.
 
-     * Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code> are ignored.
+     * Comments, prologs, DTDs, and <code>&lt;[ [ ]]&gt;</code> are ignored.
      * @param string The XML source text.
      * @return A JSONObject containing the structured data from the XML string.
      * @throws io.innerloop.neo4j.client.json.JSONException

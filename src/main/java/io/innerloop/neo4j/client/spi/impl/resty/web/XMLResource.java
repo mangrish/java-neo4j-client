@@ -62,7 +62,7 @@ public class XMLResource extends TextResource {
 	 * @param path path to the URI to follow, must be a String QName result
 	 * @return a new resource, as a result of getting it from the server in JSON format
 	 * @throws Exception
-	 * @throws JSONException
+	 * @throws io.innerloop.neo4j.client.json.JSONException
 	 */
 	public JSONResource json(XPathQuery path) throws Exception {
 		String uri = path.eval(this, String.class);
@@ -75,7 +75,7 @@ public class XMLResource extends TextResource {
 	 * @param aContent the content to POST
 	 * @return a new resource, as a result of getting it from the server in JSON format
 	 * @throws Exception
-	 * @throws JSONException
+	 * @throws io.innerloop.neo4j.client.json.JSONException
 	 */
 	public JSONResource json(XPathQuery path, Content aContent) throws Exception {
 		String uri = path.eval(this, String.class);

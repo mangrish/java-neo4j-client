@@ -24,10 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import io.innerloop.neo4j.client.json.*;
-import io.innerloop.neo4j.client.json.JSONArray;
-import io.innerloop.neo4j.client.json.JSONObject;
-
 import java.util.Iterator;
 
 /**

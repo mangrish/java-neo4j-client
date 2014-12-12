@@ -20,6 +20,10 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
+javadoc {
+    failOnError = false
+}
+
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
@@ -75,7 +79,7 @@ uploadArchives {
                     developer {
                         id 'mangrish'
                         name 'Mark Angrish'
-                        email 'mark.angrish@gmail.com'
+                        email 'mark.angrish@innerloop.io'
                     }
                 }
             }

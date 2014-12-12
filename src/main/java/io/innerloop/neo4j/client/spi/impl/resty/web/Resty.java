@@ -56,7 +56,7 @@ import io.innerloop.neo4j.client.spi.impl.resty.web.ssl.TrustAllX509SocketFactor
  * <pre>
  * <code>
  * 	Resty r = new Resty();
- * 	Object name = r.json("http://ws.geonames.org/postalCodeLookupJSON?postalcode=66780&country=DE").get("postalcodes[0].placeName");
+ * 	Object name = r.json("http://ws.geonames.org/postalCodeLookupJSON?postalcode=66780&amp;country=DE").get("postalcodes[0].placeName");
  * 	assertEquals(name, "Rehlingen-Siersburg");
  * </code>
  * </pre>
@@ -218,7 +218,7 @@ public class Resty {
 		return doPOSTOrPUT(anUri, requestContent, createJSONResource());
 	}
 
-	/** @see Resty#json(URI, Content) */
+	/** @see Resty#json(URI, AbstractContent) */
 	public JSONResource json(String anUri, AbstractContent content) throws IOException {
 		return json(URI.create(anUri), content);
 	}
@@ -321,7 +321,7 @@ public class Resty {
 		return doPOSTOrPUT(anUri, requestContent, createXMLResource());
 	}
 
-	/** @see Resty#xml(URI, Content) */
+	/** @see Resty#xml(URI, AbstractContent) */
 	public XMLResource xml(String anUri, AbstractContent content) throws IOException {
 		return xml(URI.create(anUri), content);
 	}
@@ -341,7 +341,7 @@ public class Resty {
 	/**
 	 * Get the resource specified by the uri and return a binary resource for it.
 	 *
-	 * @param uri
+	 * @param anUri
 	 *          the uri to follow
 	 * @return
 	 * @throws IOException
@@ -369,7 +369,7 @@ public class Resty {
 	/**
 	 * POST to the URI and get the resource as binary resource.
 	 *
-	 * @param uri
+	 * @param anUri
 	 *          the uri to follow
 	 * @return
 	 * @throws IOException
@@ -415,10 +415,10 @@ public class Resty {
 	/**
 	 * Get the content from the URLConnection, create a Resource representing the content and carry over some metadata like HTTP Result and location header.
 	 *
-	 * @param <T extends AbstractResource> the resource that will be created and filled
+	 * @param <T> the resource that will be created and filled
 	 * @param con
 	 *          the URLConnection used to get the data
-	 * @param resourceClass
+	 * @param resource
 	 *          the resource class to instantiate
 	 * @return the new resource
 	 * @throws IOException
@@ -501,7 +501,7 @@ public class Resty {
 	}
 
 	/**
-	 * Create form content as application/x-www-form-urlencoded (i.e. a=b&c=d&...)
+	 * Create form content as application/x-www-form-urlencoded (i.e. a=b&amp;c=d&amp;...)
 	 *
 	 * @param query
 	 *          the preformatted, properly encoded form data
@@ -626,7 +626,7 @@ public class Resty {
     /**
      * Defines the HttpsURLConnection's default SSLSocketFactory and HostnameVerifier so that all subsequence HttpsURLConnection instances
      * will trusts all certificates and accept all certificate hostnames.
-     * <p/>
+     * <p>
      * WARNING: Using this is dangerous as it bypasses most of what ssl certificates are made for. However, self-signed certificate, testing, and
      * domains with multiple sub-domains will not fail handshake verification when this setting is applied.
      */
@@ -672,7 +672,7 @@ public class Resty {
 
 		/**
 		 * Specify the connection timeout in milliseconds.
-		 * Example: <code><pre> new Resty(Option.timeout(3000)); </pre></code>
+		 * Example: <pre> new Resty(Option.timeout(3000)); </pre>
 		 * @see java.net.URLConnection#setConnectTimeout(int)
 		 * @param t
 		 *          the timeout
