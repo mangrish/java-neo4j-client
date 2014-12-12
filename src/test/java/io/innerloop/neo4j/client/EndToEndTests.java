@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -88,6 +90,51 @@ public class EndToEndTests
 
         Set<Node> nodes = result.getNodes();
         assertEquals(2, nodes.size());
+
+        Set<Relationship> relationships = result.getRelationships();
+        assertEquals(1, relationships.size());
+    }
+
+    @Test
+    public void testBasicLongTransaction()
+    {
+        Transaction transaction1 = client.getLongTransaction();
+
+        try
+        {
+            transaction1.begin();
+
+            Statement<RowSet> statement1 = new RowStatement("MERGE (n1:Graph{id:\"id1\", prop1:\"property1\"})-[:connectedTo]-(n2:Graph{id:\"id2\", prop1:\"property2\"})");
+            Statement<RowSet> statement2 = new RowStatement("MERGE (n2:Graph{id:\"id3\", prop1:\"property3\"})");
+
+            transaction1.add(statement1);
+            transaction1.add(statement2);
+            transaction1.flush();
+
+            Statement<RowSet> statement3 = new RowStatement("MERGE (n2:Graph{id:\"id4\"}) SET n2 = {props}");
+            Map<String, Object> props = new HashMap<>();
+            props.put("id", "id4");
+            props.put("prop1", "property4");
+            props.put("random", 213);
+            statement3.setParam("props", props);
+
+            transaction1.add(statement3);
+            transaction1.commit();
+        } catch (Exception e) {
+            transaction1.rollback();
+        }
+
+
+        //check if the nodes were inserted
+        Transaction transaction2 = client.getAtomicTransaction();
+        Statement<Graph> statement = new GraphStatement("MATCH (n:Graph) OPTIONAL MATCH (n)-[rels]-() RETURN n, rels");
+        transaction2.add(statement);
+        transaction2.commit();
+        Graph result = statement.getResult();
+        assertNotNull(result);
+
+        Set<Node> nodes = result.getNodes();
+        assertEquals(4, nodes.size());
 
         Set<Relationship> relationships = result.getRelationships();
         assertEquals(1, relationships.size());

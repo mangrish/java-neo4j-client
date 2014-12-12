@@ -12,6 +12,10 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
