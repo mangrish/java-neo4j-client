@@ -6,7 +6,7 @@ apply plugin: 'signing'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 group = "io.innerloop"
-version = "0.1.1"
+version = "0.2.0-SNAPSHOT"
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'

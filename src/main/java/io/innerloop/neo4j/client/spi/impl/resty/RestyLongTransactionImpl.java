@@ -42,7 +42,7 @@ public class RestyLongTransactionImpl implements Transaction
 
     public static void closeTransaction()
     {
-        activeTransactions.set(null);
+        activeTransactions.remove();
     }
 
     private final Resty client;
