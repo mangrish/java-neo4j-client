@@ -1,9 +1,13 @@
 package io.innerloop.neo4j.client;
 
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.neo4j.server.CommunityNeoServer;
+import org.neo4j.server.helpers.CommunityServerBuilder;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +17,7 @@ import java.util.concurrent.Executors;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -20,137 +25,102 @@ import static org.junit.Assert.assertTrue;
  */
 public class EndToEndTests
 {
-    private static Neo4jClient client;
+    private Neo4jClient client;
 
-    @BeforeClass
-    public static void oneTimeSetUp()
-    {
-        client = new Neo4jClient("http://localhost:7474/db/data");
-    }
+    private CommunityNeoServer server;
 
     @Before
-    public void setUp()
+    public void setUp()  throws IOException, InterruptedException, Neo4jClientException
     {
-        Transaction transaction = client.getAtomicTransaction();
+        int port = new ServerSocket(0).getLocalPort();
 
-        try
+        server = CommunityServerBuilder.server().onPort(port).build();
+        server.start();
+
+        while (!server.getDatabase().isRunning())
         {
-            Statement<RowSet> statement = new RowStatement("MATCH (n:Label:BulkInsert:Graph) OPTIONAL MATCH (n)-[r]-(m) DELETE n, r, m");
-            transaction.add(statement);
-            transaction.commit();
+            // It's ok to spin here.. it's not production code.
+            Thread.sleep(250);
         }
-        catch (Neo4jClientException e)
-        {
-            throw new RuntimeException(e);
-        }
+        client = new Neo4jClient("http://localhost:" + port + "/db/data");
     }
 
+    @After
+    public void tearDown()
+    {
+        server.stop();
+        client = null;
+    }
 
     @Test
-    public void testSimpleQuery()
+    public void testSimpleQuery() throws Neo4jClientException
     {
         Transaction transaction = client.getAtomicTransaction();
 
-        try
-        {
-            Statement<RowSet> statement = new RowStatement("MATCH (n) RETURN count(n)");
-            transaction.add(statement);
-            transaction.commit();
+        Statement<RowSet> statement = new RowStatement("MATCH (n) RETURN count(n)");
+        transaction.add(statement);
+        transaction.commit();
 
-            RowSet result = statement.getResult();
-            assertNotNull(result);
-            int totalNodes = result.getInt(0);
-            assertTrue(totalNodes >= 0);
-        }
-        catch (Neo4jClientException e)
-        {
-            throw new RuntimeException(e);
-        }
+        RowSet result = statement.getResult();
+        assertNotNull(result);
+        int totalNodes = result.getInt(0);
+        assertTrue(totalNodes >= 0);
 
     }
 
     @Test
-    public void testInsertCompoundStatements()
+    public void testInsertCompoundStatements() throws Neo4jClientException
     {
         Transaction transaction1 = client.getAtomicTransaction();
 
-        try
-        {
-            Statement<RowSet> statement1 = new RowStatement("MERGE (n:Label{id:\"id1\", prop1:\"property1\"})");
-            Statement<RowSet> statement2 = new RowStatement("MERGE (n:Label{id:\"id2\", prop1:\"property2\"})");
-            transaction1.add(statement1);
-            transaction1.add(statement2);
-            transaction1.commit();
-        }
-        catch (Neo4jClientException e)
-        {
-            throw new RuntimeException(e);
-        }
+        Statement<RowSet> statement1 = new RowStatement("MERGE (n:Label{id:\"id1\", prop1:\"property1\"})");
+        Statement<RowSet> statement2 = new RowStatement("MERGE (n:Label{id:\"id2\", prop1:\"property2\"})");
+        transaction1.add(statement1);
+        transaction1.add(statement2);
+        transaction1.commit();
 
         //check if the nodes were inserted
         Transaction transaction2 = client.getAtomicTransaction();
 
-        try
-        {
-            Statement<RowSet> statement = new RowStatement("MATCH (n:Label) RETURN count(n) as number_of_nodes");
-            transaction2.add(statement);
-            transaction2.commit();
+        Statement<RowSet> statement = new RowStatement("MATCH (n:Label) RETURN count(n) as number_of_nodes");
+        transaction2.add(statement);
+        transaction2.commit();
 
-            RowSet result = statement.getResult();
-            assertNotNull(result);
-            int numberOfLabelNodes = result.getInt(0);
-            assertEquals(2, numberOfLabelNodes);
-        }
-        catch (Neo4jClientException e)
-        {
-            throw new RuntimeException(e);
-        }
+        RowSet result = statement.getResult();
+        assertNotNull(result);
+        int numberOfLabelNodes = result.getInt(0);
+        assertEquals(2, numberOfLabelNodes);
 
     }
 
     @Test
-    public void testGraphCreationAndRetrieval()
+    public void testGraphCreationAndRetrieval() throws Neo4jClientException
     {
         Transaction transaction1 = client.getAtomicTransaction();
 
-        try
-        {
-            Statement<RowSet> statement1 = new RowStatement("MERGE (n1:Graph{id:\"id1\", prop1:\"property1\"})-[:connectedTo]-(n2:Graph{id:\"id2\", prop1:\"property2\"})");
-            transaction1.add(statement1);
-            transaction1.commit();
-        }
-        catch (Neo4jClientException e)
-        {
-            throw new RuntimeException(e);
-        }
+        Statement<RowSet> statement1 = new RowStatement("MERGE (n1:Graph{id:\"id1\", prop1:\"property1\"})-[:connectedTo]-(n2:Graph{id:\"id2\", prop1:\"property2\"})");
+        transaction1.add(statement1);
+        transaction1.commit();
 
         //check if the nodes were inserted
         Transaction transaction2 = client.getAtomicTransaction();
 
-        try
-        {
-            Statement<Graph> statement = new GraphStatement("MATCH (n:Graph)-[rels]-() RETURN rels");
-            transaction2.add(statement);
-            transaction2.commit();
+        Statement<Graph> statement = new GraphStatement("MATCH (n:Graph)-[rels]-() RETURN rels");
+        transaction2.add(statement);
+        transaction2.commit();
 
-            Graph result = statement.getResult();
-            assertNotNull(result);
+        Graph result = statement.getResult();
+        assertNotNull(result);
 
-            Set<Node> nodes = result.getNodes();
-            assertEquals(2, nodes.size());
+        Set<Node> nodes = result.getNodes();
+        assertEquals(2, nodes.size());
 
-            Set<Relationship> relationships = result.getRelationships();
-            assertEquals(1, relationships.size());
-
-        }
-        catch (Neo4jClientException e)
-        {
-            throw new RuntimeException(e);
-        }
+        Set<Relationship> relationships = result.getRelationships();
+        assertEquals(1, relationships.size());
     }
 
     @Test
-    public void testBasicLongTransaction()
+    public void testBasicLongTransaction() throws Neo4jClientException
     {
         Transaction transaction1 = client.getLongTransaction();
 
@@ -177,50 +147,36 @@ public class EndToEndTests
         }
         catch (Neo4jClientException e)
         {
-            try
-            {
-                transaction1.rollback();
-            }
-            catch (Neo4jClientException e1)
-            {
-                throw new RuntimeException(e);
-            }
+            transaction1.rollback();
+            fail("Should have been able to commit. Rolled back to keep DB consistent.");
         }
-
 
         //check if the nodes were inserted
         Transaction transaction2 = client.getAtomicTransaction();
 
-        try
-        {
-            Statement<Graph> statement = new GraphStatement("MATCH (n:Graph) OPTIONAL MATCH (n)-[rels]-() RETURN n, rels");
-            transaction2.add(statement);
-            transaction2.commit();
+        Statement<Graph> statement = new GraphStatement("MATCH (n:Graph) OPTIONAL MATCH (n)-[rels]-() RETURN n, rels");
+        transaction2.add(statement);
+        transaction2.commit();
 
-            Graph result = statement.getResult();
-            assertNotNull(result);
+        Graph result = statement.getResult();
+        assertNotNull(result);
 
-            Set<Node> nodes = result.getNodes();
-            assertEquals(4, nodes.size());
+        Set<Node> nodes = result.getNodes();
+        assertEquals(4, nodes.size());
 
-            Set<Relationship> relationships = result.getRelationships();
-            assertEquals(1, relationships.size());
+        Set<Relationship> relationships = result.getRelationships();
+        assertEquals(1, relationships.size());
 
-        }
-        catch (Neo4jClientException e)
-        {
-            throw new RuntimeException(e);
-        }
 
     }
 
     @Test
-    public void testMultipleThreadsInsertingCompoundStatements() throws InterruptedException
+    public void testMultipleThreadsInsertingCompoundStatements() throws InterruptedException, Neo4jClientException
     {
         ExecutorService service = Executors.newFixedThreadPool(10);
         CountDownLatch latch = new CountDownLatch(1000);
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 1; i <= 100; i++)
         {
             service.execute(new InsertJob(latch, i));
         }
@@ -230,21 +186,14 @@ public class EndToEndTests
         //check if the nodes were inserted
         Transaction transaction2 = client.getAtomicTransaction();
 
-        try
-        {
-            Statement<RowSet> statement = new RowStatement("MATCH (n:BulkInsert) RETURN count(n) as number_of_nodes");
-            transaction2.add(statement);
-            transaction2.commit();
+        Statement<RowSet> statement = new RowStatement("MATCH (n:BulkInsert) RETURN count(n) as number_of_nodes");
+        transaction2.add(statement);
+        transaction2.commit();
 
-            RowSet result = statement.getResult();
-            assertNotNull(result);
-            int numberOfLabelNodes = result.getInt(0);
-            assertEquals(1000, numberOfLabelNodes);
-        }
-        catch (Neo4jClientException e)
-        {
-            throw new RuntimeException(e);
-        }
+        RowSet result = statement.getResult();
+        assertNotNull(result);
+        int numberOfLabelNodes = result.getInt(0);
+        assertEquals(1000, numberOfLabelNodes);
 
     }
 
@@ -265,21 +214,24 @@ public class EndToEndTests
         {
             Transaction transaction = client.getAtomicTransaction();
 
-
             try
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 1; i <= 10; i++)
                 {
                     Statement<RowSet> statement1 = new RowStatement("MERGE (n:BulkInsert{id:\"id" + id + i +
-                                                                    "\", prop1:\"property1\"})");
+                                                                    "\"})");
                     transaction.add(statement1);
-                    latch.countDown();
                 }
                 transaction.commit();
             }
             catch (Neo4jClientException e)
             {
                 throw new RuntimeException(e);
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                latch.countDown();
             }
         }
     }

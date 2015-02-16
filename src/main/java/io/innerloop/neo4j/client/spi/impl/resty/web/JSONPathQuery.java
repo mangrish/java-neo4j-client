@@ -1,13 +1,13 @@
 package io.innerloop.neo4j.client.spi.impl.resty.web;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.logging.Logger;
-
 import io.innerloop.neo4j.client.json.JSONException;
 import io.innerloop.neo4j.client.json.JSONObject;
 import io.innerloop.neo4j.client.spi.impl.resty.web.jp.javacc.JSONPathCompiler;
 import io.innerloop.neo4j.client.spi.impl.resty.web.jp.javacc.ParseException;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.logging.Logger;
 
 
 

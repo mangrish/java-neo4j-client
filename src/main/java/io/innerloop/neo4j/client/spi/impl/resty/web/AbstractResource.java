@@ -3,8 +3,14 @@
  */
 package io.innerloop.neo4j.client.spi.impl.resty.web;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;

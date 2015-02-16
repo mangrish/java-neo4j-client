@@ -1,8 +1,5 @@
 package io.innerloop.neo4j.client.json;
 
-import io.innerloop.neo4j.client.json.*;
-import io.innerloop.neo4j.client.json.JSONObject;
-
 import java.io.IOException;
 import java.io.Writer;
 

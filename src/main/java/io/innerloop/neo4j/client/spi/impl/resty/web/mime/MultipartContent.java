@@ -1,5 +1,7 @@
 package io.innerloop.neo4j.client.spi.impl.resty.web.mime;
 
+import io.innerloop.neo4j.client.spi.impl.resty.web.AbstractContent;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLConnection;
@@ -7,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import io.innerloop.neo4j.client.spi.impl.resty.web.AbstractContent;
 
 /** Content handler for multipart data of any shape (form, mixed, alternative)
  *

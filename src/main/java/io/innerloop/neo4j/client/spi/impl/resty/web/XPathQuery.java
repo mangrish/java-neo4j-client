@@ -1,14 +1,14 @@
 package io.innerloop.neo4j.client.spi.impl.resty.web;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /** PathQuery for XPath.
  * Use this to access XMLResource objects.

@@ -1,13 +1,12 @@
 package io.innerloop.neo4j.client.spi.impl.resty;
 
 import io.innerloop.neo4j.client.Graph;
-import io.innerloop.neo4j.client.Neo4jClientException;
+import io.innerloop.neo4j.client.Neo4jServerException;
 import io.innerloop.neo4j.client.Node;
 import io.innerloop.neo4j.client.Relationship;
 import io.innerloop.neo4j.client.RowSet;
 import io.innerloop.neo4j.client.json.JSONArray;
 import io.innerloop.neo4j.client.json.JSONObject;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,17 +27,17 @@ public class ExecutionResult
         this.response = response;
     }
 
-    public Neo4jClientException[] getErrors()
+    public Neo4jServerException[] getErrors()
     {
         JSONArray errorsJson = response.getJSONArray("errors");
         int length = errorsJson.length();
 
-        Neo4jClientException[] errors = new Neo4jClientException[length];
+        Neo4jServerException[] errors = new Neo4jServerException[length];
 
         for (int i = 0; i < length; i++)
         {
             JSONObject errorJson = errorsJson.getJSONObject(i);
-            errors[i] = new Neo4jClientException(errorJson.optString("code"), errorJson.optString("message"));
+            errors[i] = new Neo4jServerException(errorJson.optString("code"), errorJson.optString("message"));
         }
 
         return errors;

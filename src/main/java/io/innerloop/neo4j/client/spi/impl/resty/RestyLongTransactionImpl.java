@@ -1,7 +1,9 @@
 package io.innerloop.neo4j.client.spi.impl.resty;
 
 import io.innerloop.neo4j.client.Neo4jClientException;
-import io.innerloop.neo4j.client.Neo4jClientMultiException;
+import io.innerloop.neo4j.client.Neo4jClientRuntimeException;
+import io.innerloop.neo4j.client.Neo4jServerException;
+import io.innerloop.neo4j.client.Neo4jServerMultiException;
 import io.innerloop.neo4j.client.Statement;
 import io.innerloop.neo4j.client.Transaction;
 import io.innerloop.neo4j.client.json.JSONObject;
@@ -80,12 +82,12 @@ public class RestyLongTransactionImpl implements Transaction
     }
 
     @Override
-    public void flush() throws Neo4jClientException
+    public void flush()
     {
-        List<JSONObject> statements = this.statements.stream().map(Statement::toJson).collect(Collectors.toList());
-        final JSONObject payload = new JSONObject().put("statements", (statements));
         try
         {
+            List<JSONObject> statements = this.statements.stream().map(Statement::toJson).collect(Collectors.toList());
+            final JSONObject payload = new JSONObject().put("statements", (statements));
             JSONResource result = client.json(activeTransactionEndpointUrl, content(payload));
             JSONObject jsonResult = result.object();
             ExecutionResult er = new ExecutionResult(jsonResult);
@@ -104,22 +106,23 @@ public class RestyLongTransactionImpl implements Transaction
                 }
             }
             this.activeTransactionEndpointUrl = jsonResult.getString("commit").replace("/commit", "");
-            this.transactionExpires = LocalDateTime.parse(jsonResult.getJSONObject("transaction").getString("expires"), FORMATTER);
+            this.transactionExpires = LocalDateTime.parse(jsonResult.getJSONObject("transaction").getString("expires"),
+                                                          FORMATTER);
             this.statements.clear();
         }
         catch (IOException e)
         {
-            throw new RuntimeException(e);
+            throw new Neo4jClientRuntimeException(e);
         }
     }
 
     @Override
     public void commit() throws Neo4jClientException
     {
-        List<JSONObject> statements = this.statements.stream().map(Statement::toJson).collect(Collectors.toList());
-        final JSONObject payload = new JSONObject().put("statements", (statements));
         try
         {
+            List<JSONObject> statements = this.statements.stream().map(Statement::toJson).collect(Collectors.toList());
+            final JSONObject payload = new JSONObject().put("statements", (statements));
             JSONResource result = client.json(activeTransactionEndpointUrl + "/commit", content(payload));
             ExecutionResult er = new ExecutionResult(result.object());
             checkErrors(er.getErrors());
@@ -137,14 +140,19 @@ public class RestyLongTransactionImpl implements Transaction
                 }
             }
         }
-        catch (IOException e)
+        catch (Exception e)
         {
-            throw new RuntimeException(e);
+            throw new Neo4jClientException("Encountered an error when trying to commit to Neo4J. See exception for details.",
+                                           e);
+        }
+        finally
+        {
+            close();
         }
     }
 
     @Override
-    public void rollback() throws Neo4jClientException
+    public void rollback()
     {
         try
         {
@@ -154,17 +162,16 @@ public class RestyLongTransactionImpl implements Transaction
         }
         catch (IOException e)
         {
-            throw new RuntimeException(e);
+            throw new Neo4jClientRuntimeException(e);
         }
     }
 
-    @Override
-    public void close()
+    private void close()
     {
         closeTransaction();
     }
 
-    void checkErrors(Neo4jClientException[] exceptions) throws Neo4jClientException
+    void checkErrors(Neo4jServerException[] exceptions)
     {
         int length = exceptions.length;
 
@@ -175,7 +182,7 @@ public class RestyLongTransactionImpl implements Transaction
 
         if (length > 1)
         {
-            throw new Neo4jClientMultiException("Multiple errors occurred when executing statements", exceptions);
+            throw new Neo4jServerMultiException("Multiple errors occurred when executing statements", exceptions);
         }
     }
 

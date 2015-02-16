@@ -24,9 +24,6 @@ package io.innerloop.neo4j.client.json;
  SOFTWARE.
  */
 
-import io.innerloop.neo4j.client.json.*;
-import io.innerloop.neo4j.client.json.JSONException;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;

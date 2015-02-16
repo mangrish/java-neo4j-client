@@ -1,5 +1,13 @@
 package io.innerloop.neo4j.client.spi.impl.resty.web;
 
+import io.innerloop.neo4j.client.json.JSONObject;
+import io.innerloop.neo4j.client.spi.impl.resty.web.auth.RestyAuthenticator;
+import io.innerloop.neo4j.client.spi.impl.resty.web.mime.MultipartContent;
+import io.innerloop.neo4j.client.spi.impl.resty.web.ssl.AllowAllHostnameVerifier;
+import io.innerloop.neo4j.client.spi.impl.resty.web.ssl.TrustAllX509SocketFactory;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.xml.xpath.XPathException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
@@ -7,21 +15,11 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-
 import java.net.URI;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.xml.xpath.XPathException;
-
-import io.innerloop.neo4j.client.json.JSONObject;
-import io.innerloop.neo4j.client.spi.impl.resty.web.auth.RestyAuthenticator;
-import io.innerloop.neo4j.client.spi.impl.resty.web.mime.MultipartContent;
-import io.innerloop.neo4j.client.spi.impl.resty.web.ssl.AllowAllHostnameVerifier;
-import io.innerloop.neo4j.client.spi.impl.resty.web.ssl.TrustAllX509SocketFactory;
 
 /**
  * Main class. Use me! Use me! Resty is a small, convenient interface to talk to RESTful services.

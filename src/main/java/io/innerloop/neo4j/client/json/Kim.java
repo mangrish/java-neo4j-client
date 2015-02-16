@@ -25,8 +25,6 @@ package io.innerloop.neo4j.client.json;
  SOFTWARE.
  */
 
-import io.innerloop.neo4j.client.json.*;
-
 /**
  * Kim makes immutable eight bit Unicode strings. If the MSB of a byte is set,
  * then the next byte is a continuation byte. The last byte of a character

@@ -24,10 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import io.innerloop.neo4j.client.json.*;
-import io.innerloop.neo4j.client.json.JSONException;
-import io.innerloop.neo4j.client.json.XML;
-
 /**
  * The XMLTokener extends the JSONTokener to provide additional methods
  * for the parsing of XML texts.

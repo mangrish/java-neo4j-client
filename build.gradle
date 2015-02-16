@@ -18,6 +18,9 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'org.neo4j.app', name: 'neo4j-server', version: '2.1.6'
+    testCompile group: 'org.neo4j.app', name: 'neo4j-server', version: '2.1.6', classifier: 'tests'
+    testCompile group: 'org.neo4j', name: 'neo4j-kernel', version: '2.1.6', classifier: 'tests'
 }
 
 javadoc {
