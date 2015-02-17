@@ -174,16 +174,22 @@ Return a graph and how many nodes are labelled with a certain Label.
 Neo4jClient client = new Neo4jClient("http://localhost:7474/db/data");
 
 Transaction transaction = client.getAtomicTransaction();
-
-Statement<Graph> statement1 = new GraphStatement("MATCH (n:Label{uuid:{uuid}})-[rels]-() RETURN n, rels")
-statement1.addParam("uuid", "abcd1234");
-
-Statement<RowSet> statement2 = new RowStatement("MATCH (n:Label) RETURN count(n)")
-
-transaction.add(statement1);
-transaction.add(statement2);
-
-transaction.commit();
+Statement<Graph> statement1 = null;
+Statement<RowSet> statement2 = null;
+try {
+    statement1 = new GraphStatement("MATCH (n:Label{uuid:{uuid}})-[rels]-() RETURN n, rels")
+    statement1.addParam("uuid", "abcd1234");
+    
+    statement2 = new RowStatement("MATCH (n:Label) RETURN count(n)")
+    
+    transaction.add(statement1);
+    transaction.add(statement2);
+    
+    transaction.commit();
+}
+catch (Neo4jClientException nce) {
+    throw new RuntimeException(nce);
+}
 
 Graph graph = statement1.getResult(); // Do your Graph stuff here!
 
