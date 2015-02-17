@@ -82,6 +82,12 @@ public class RestyLongTransactionImpl implements Transaction
     }
 
     @Override
+    public List<Statement> getStatements()
+    {
+        return statements;
+    }
+
+    @Override
     public void flush()
     {
         try

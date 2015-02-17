@@ -1,5 +1,7 @@
 package io.innerloop.neo4j.client;
 
+import java.util.List;
+
 /**
  * A Transaction represents an interaction with the database. All Neo4J Cypher Queries must run within a Transaction,
  * even reads. Thus all reads are always READ COMMITTED.
@@ -23,12 +25,21 @@ public interface Transaction
     void add(Statement statement);
 
     /**
+     * Retrieves any Statements that have not been executed in the cache.
+     * <p>
+     * <p>This will be empty if flush or commit is called before accessing this.</p>
+     *
+     * @return A list of statements scheduled to be executed.
+     */
+    List<Statement> getStatements();
+
+    /**
      * Flushes the Statements currently held by this transaction to Neo4J. Once this method is called any statements
      * issued before a call to this method will have their results available. Note that any reads in this Transaction
      * will still only be READ COMMITTED. Writes in this Transaction will be UNCOMMITTED until commit() is called. That
      * is this transaction will be fully isolated until commit() is called. Calling Rollback will not roll back
-     * statements to this point (like a savepoint) rather it will rollback the entire transaction including any
-     * flush()s called previously.
+     * statements to this point (like a savepoint) rather it will rollback the entire transaction including any flush()s
+     * called previously.
      *
      * @throws Neo4jClientRuntimeException
      *         If an error occurs in flushing to the database. It is generally expected that a client will not be able
@@ -36,8 +47,8 @@ public interface Transaction
      * @throws Neo4jServerException
      *         If the Neo4J Server responds with an error.
      * @throws Neo4jServerMultiException
-     *         If the Neo4J Server responds with with multiple errors (this probably doesn't happen but there is no
-     *         way to know for sure).
+     *         If the Neo4J Server responds with with multiple errors (this probably doesn't happen but there is no way
+     *         to know for sure).
      */
     void flush();
 
@@ -45,8 +56,8 @@ public interface Transaction
      * Commits this Transaction to Neo4J.
      *
      * @throws Neo4jClientException
-     *         If an error occurs in committing this transaction to the database. Clients may then choose to catch
-     *         and rollback this transaction if desired.
+     *         If an error occurs in committing this transaction to the database. Clients may then choose to catch and
+     *         rollback this transaction if desired.
      */
     void commit() throws Neo4jClientException;
 
@@ -58,8 +69,8 @@ public interface Transaction
      * @throws Neo4jServerException
      *         If the Neo4J Server responds with an error.
      * @throws Neo4jServerMultiException
-     *         If the Neo4J Server responds with with multiple errors (this probably doesn't happen but there is no
-     *         way to know for sure).
+     *         If the Neo4J Server responds with with multiple errors (this probably doesn't happen but there is no way
+     *         to know for sure).
      */
     void rollback();
 }

@@ -46,6 +46,12 @@ public class RestyAtomicTransactionImpl implements Transaction
     }
 
     @Override
+    public List<Statement> getStatements()
+    {
+        return statements;
+    }
+
+    @Override
     public void flush()
     {
         throw new UnsupportedOperationException("Long Transactions not currently supported by this driver.");
