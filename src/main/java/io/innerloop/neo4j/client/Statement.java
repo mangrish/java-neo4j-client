@@ -42,6 +42,17 @@ public abstract class Statement<T>
         this.resultDataContents = new String[] {getType()};
     }
 
+
+    /**
+     * Retrieves the query used in this statement.
+     *
+     * @return The cypher query used for this statement.
+     */
+    public String getQuery()
+    {
+        return this.statement;
+    }
+
     /**
      * Neo4J supports parameter binding in cypher by inserting { paramName } into the query.
      * <p>
