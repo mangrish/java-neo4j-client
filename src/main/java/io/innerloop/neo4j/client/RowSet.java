@@ -50,7 +50,7 @@ public class RowSet
      */
     public Object[] next()
     {
-        return rows.get(++currentRow);
+        return rows.get(currentRow++);
     }
 
     /**
