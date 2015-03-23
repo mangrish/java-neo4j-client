@@ -38,9 +38,19 @@ public class RowSet
      *
      * @return true, if there is another row in this row set.
      */
-    public boolean next()
+    public boolean hasNext()
     {
-        return totalRows > ++currentRow;
+        return totalRows > currentRow;
+    }
+
+    /**
+     * Determines if there is another row in the result set.
+     *
+     * @return true, if there is another row in this row set.
+     */
+    public Object[] next()
+    {
+        return rows.get(++currentRow);
     }
 
     /**
