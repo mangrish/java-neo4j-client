@@ -86,7 +86,7 @@ public class RowSet
      */
     public long getLong(int column)
     {
-        return (long) getRow(currentRow)[column];
+        return ((Number)getRow(currentRow)[column]).longValue();
     }
 
     /**
