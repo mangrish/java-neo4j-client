@@ -9,6 +9,7 @@ import io.innerloop.neo4j.client.Neo4jServerMultiException;
 import io.innerloop.neo4j.client.RowSet;
 import io.innerloop.neo4j.client.RowStatement;
 import io.innerloop.neo4j.client.Statement;
+import io.innerloop.neo4j.client.json.JSONException;
 import io.innerloop.neo4j.client.json.JSONObject;
 import io.innerloop.neo4j.client.spi.impl.resty.web.JSONResource;
 import io.innerloop.neo4j.client.spi.impl.resty.web.Resty;
@@ -99,7 +100,13 @@ public class RestyConnectionImpl implements Connection
 
         catch (IOException e)
         {
+            close();
             throw new Neo4jClientException(e);
+        }
+        catch (JSONException e)
+        {
+            close();
+            throw new Neo4jClientException("Error when processing JSON response.", e);
         }
     }
 
@@ -138,7 +145,13 @@ public class RestyConnectionImpl implements Connection
 
         catch (IOException e)
         {
+            close();
             throw new Neo4jClientException(e);
+        }
+        catch (JSONException e)
+        {
+            close();
+            throw new Neo4jClientException("Error when processing JSON response.", e);
         }
     }
 
@@ -180,7 +193,13 @@ public class RestyConnectionImpl implements Connection
         }
         catch (IOException e)
         {
+            close();
             throw new Neo4jClientException(e);
+        }
+        catch (JSONException e)
+        {
+            close();
+            throw new Neo4jClientException("Error when processing JSON response.", e);
         }
     }
 
