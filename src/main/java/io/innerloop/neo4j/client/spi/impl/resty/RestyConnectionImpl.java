@@ -13,6 +13,8 @@ import io.innerloop.neo4j.client.json.JSONException;
 import io.innerloop.neo4j.client.json.JSONObject;
 import io.innerloop.neo4j.client.spi.impl.resty.web.JSONResource;
 import io.innerloop.neo4j.client.spi.impl.resty.web.Resty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -29,6 +31,8 @@ import static io.innerloop.neo4j.client.spi.impl.resty.web.Resty.delete;
  */
 public class RestyConnectionImpl implements Connection
 {
+    private static final Logger LOG = LoggerFactory.getLogger(RestyConnectionImpl.class);
+
     private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z");
 
     private static ThreadLocal<RestyConnectionImpl> connectionHolder = new ThreadLocal<>();
@@ -39,6 +43,7 @@ public class RestyConnectionImpl implements Connection
 
         if (connection == null)
         {
+            LOG.debug("Getting new Connection for Thread: [{}]", Thread.currentThread().getName());
             connection = new RestyConnectionImpl(client, transactionEndpointUrl);
             connectionHolder.set(connection);
         }
@@ -91,11 +96,16 @@ public class RestyConnectionImpl implements Connection
     {
         try
         {
+            LOG.debug("Flushing to [{}]", activeTransactionEndpointUrl);
             JSONObject jsonResult = execute(activeTransactionEndpointUrl);
             this.activeTransactionEndpointUrl = jsonResult.getString("commit").replace("/commit", "");
             this.transactionExpires = LocalDateTime.parse(jsonResult.getJSONObject("transaction").getString("expires"),
                                                           FORMATTER);
             this.statements.clear();
+            LOG.debug("Next endpoint is now: [{}] which expires at: [{}]",
+                      activeTransactionEndpointUrl,
+                      transactionExpires);
+
         }
 
         catch (IOException e)
@@ -115,7 +125,9 @@ public class RestyConnectionImpl implements Connection
     {
         try
         {
-            execute(activeTransactionEndpointUrl + "/commit");
+            String commitEndpoint = activeTransactionEndpointUrl + "/commit";
+            LOG.debug("Committing to [{}]", commitEndpoint);
+            execute(commitEndpoint);
         }
         catch (Exception e)
         {
@@ -124,6 +136,7 @@ public class RestyConnectionImpl implements Connection
         }
         finally
         {
+            LOG.debug("Successfully committed");
             close();
         }
     }
@@ -134,8 +147,11 @@ public class RestyConnectionImpl implements Connection
         try
         {
             final JSONObject payload = new JSONObject().put("statements", new ArrayList<JSONObject>());
+            LOG.debug("Payload is: [{}]", payload.toString());
             JSONResource result = client.json(activeTransactionEndpointUrl, content(payload));
+            LOG.debug("Raw result is: [{}]", result);
             JSONObject jsonResult = result.object();
+            LOG.debug("Json result is: [{}]", jsonResult);
             ExecutionResult er = new ExecutionResult(jsonResult);
             checkErrors(er.getErrors());
             this.activeTransactionEndpointUrl = jsonResult.getString("commit").replace("/commit", "");
@@ -160,8 +176,11 @@ public class RestyConnectionImpl implements Connection
     {
         List<JSONObject> statements = this.statements.stream().map(Statement::toJson).collect(Collectors.toList());
         final JSONObject payload = new JSONObject().put("statements", (statements));
+        LOG.debug("Payload is: [{}]", payload.toString());
         JSONResource result = client.json(endpointUrl, content(payload));
+        LOG.debug("Raw result is: [{}]", result);
         JSONObject jsonResult = result.object();
+        LOG.debug("Json result is: [{}]", jsonResult);
         ExecutionResult er = new ExecutionResult(jsonResult);
         checkErrors(er.getErrors());
         for (int i = 0; i < this.statements.size(); i++)
