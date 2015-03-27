@@ -41,27 +41,14 @@ public class Neo4jClient
     }
 
     /**
-     * Retrieve a new Atomic Connection. Most Neo4J usage scenarios can be implemented with an Atomic Transaction. That
-     * is this transaction supports multiple statements being added to it and executed in an all or nothing effect that
-     * works within the ACID conditions of Neo4J. <p> <p>Users will not have to rollback transactions. An Atomic
-     * Transaction is a once off execution that will commit all statements in the transaction or none at all</p>
-     *
-     * @return An Atomic Transaction. begin() and rollback() have no use.
-     */
-    public Transaction getAtomicTransaction()
-    {
-        return transactionFactory.getAtomicTransaction();
-    }
-
-    /**
      * Create a new Long Transaction or retrieve the existing one on the currently executing Thread.
      * Unlike Atomic Transactions, Long Transactions make use of begin() and rollback() but come with a performance
      * penalty when compared to Atomic Transactions.
      *
      * @return A Long Transaction.
      */
-    public Transaction getLongTransaction()
+    public Transaction getTransaction()
     {
-        return transactionFactory.getLongTransaction();
+        return transactionFactory.getTransaction();
     }
 }

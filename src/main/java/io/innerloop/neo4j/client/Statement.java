@@ -16,7 +16,7 @@ import java.util.Map;
  * <p>
  * NOTE: This API will probably change to support a builder style Statement builder.
  */
-public abstract class Statement<T>
+public abstract class Statement
 {
     protected final String statement;
 
@@ -25,8 +25,6 @@ public abstract class Statement<T>
     private final String[] resultDataContents;
 
     protected boolean includeStats;
-
-    private T result;
 
     /**
      * Create a new Statement for the provided cypher query.
@@ -66,28 +64,6 @@ public abstract class Statement<T>
     public void setParam(String key, Object value)
     {
         parameters.put(key, value);
-    }
-
-    /**
-     * Retrieves the result of this Statement. Only accessible after Transaction#commit() has been called.
-     *
-     * @return The result of the execution of this statement if available. If called before Transaction#commit(), null
-     * is returned.
-     */
-    public T getResult()
-    {
-        return result;
-    }
-
-    /**
-     * Sets the result on this Statement.
-     *
-     * @param result
-     *         The result to set.
-     */
-    public void setResult(T result)
-    {
-        this.result = result;
     }
 
     /**

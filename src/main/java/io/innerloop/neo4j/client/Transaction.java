@@ -1,5 +1,6 @@
 package io.innerloop.neo4j.client;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -10,11 +11,6 @@ import java.util.List;
  */
 public interface Transaction
 {
-    /**
-     * Starts a Transaction.
-     */
-    void begin();
-
     /**
      * Adds the given statement to execute within this Transaction. This method can be called multiple times with
      * different statements before calling flush(), commit() or rollback().
@@ -34,6 +30,19 @@ public interface Transaction
     List<Statement> getStatements();
 
     /**
+     * Retrieves when this transaction will expire.
+     *
+     * @return A date time specifying when this transaction will expire..
+     */
+    LocalDateTime getExpiry();
+
+    /**
+     * Extends the life of this transaction. Can be used in conjunction with getExpiry() in a daemon thread to
+     * monitor expiry. TODO: NOT CURRENTLY THREADSAFE
+     */
+    void resetExpiry();
+
+    /**
      * Flushes the Statements currently held by this transaction to Neo4J. Once this method is called any statements
      * issued before a call to this method will have their results available. Note that any reads in this Transaction
      * will still only be READ COMMITTED. Writes in this Transaction will be UNCOMMITTED until commit() is called. That
@@ -41,11 +50,9 @@ public interface Transaction
      * statements to this point (like a savepoint) rather it will rollback the entire transaction including any flush()s
      * called previously.
      *
-     * @throws Neo4jClientRuntimeException
-     *         If an error occurs in flushing to the database. It is generally expected that a client will not be able
-     *         to recover from this error.
      * @throws Neo4jServerException
-     *         If the Neo4J Server responds with an error.
+     *          If an error occurs in flushing to the database. It is generally expected that a client will not be able
+     *         to recover from this error.
      * @throws Neo4jServerMultiException
      *         If the Neo4J Server responds with with multiple errors (this probably doesn't happen but there is no way
      *         to know for sure).
@@ -59,15 +66,13 @@ public interface Transaction
      *         If an error occurs in committing this transaction to the database. Clients may then choose to catch and
      *         rollback this transaction if desired.
      */
-    void commit() throws Neo4jClientException;
+    void commit();
 
     /**
      * Rolls back any changes made by this Transaction.
      *
-     * @throws Neo4jClientRuntimeException
-     *         If an error occurs trying to rollback the transaction.
      * @throws Neo4jServerException
-     *         If the Neo4J Server responds with an error.
+     *          If an error occurs trying to rollback the transaction.
      * @throws Neo4jServerMultiException
      *         If the Neo4J Server responds with with multiple errors (this probably doesn't happen but there is no way
      *         to know for sure).

@@ -30,7 +30,7 @@ public class EndToEndTests
     private CommunityNeoServer server;
 
     @Before
-    public void setUp()  throws IOException, InterruptedException, Neo4jClientException
+    public void setUp() throws IOException, InterruptedException
     {
         int port = new ServerSocket(0).getLocalPort();
 
@@ -53,11 +53,11 @@ public class EndToEndTests
     }
 
     @Test
-    public void testSimpleQuery() throws Neo4jClientException
+    public void testSimpleQuery()
     {
-        Transaction transaction = client.getAtomicTransaction();
+        Transaction transaction = client.getTransaction();
 
-        Statement<RowSet> statement = new RowStatement("MATCH (n) RETURN count(n)");
+        RowStatement statement = new RowStatement("MATCH (n) RETURN count(n)");
         transaction.add(statement);
         transaction.commit();
 
@@ -69,20 +69,20 @@ public class EndToEndTests
     }
 
     @Test
-    public void testInsertCompoundStatements() throws Neo4jClientException
+    public void testInsertCompoundStatements()
     {
-        Transaction transaction1 = client.getAtomicTransaction();
+        Transaction transaction1 = client.getTransaction();
 
-        Statement<RowSet> statement1 = new RowStatement("MERGE (n:Label{id:\"id1\", prop1:\"property1\"})");
-        Statement<RowSet> statement2 = new RowStatement("MERGE (n:Label{id:\"id2\", prop1:\"property2\"})");
+        RowStatement statement1 = new RowStatement("MERGE (n:Label{id:\"id1\", prop1:\"property1\"})");
+        RowStatement statement2 = new RowStatement("MERGE (n:Label{id:\"id2\", prop1:\"property2\"})");
         transaction1.add(statement1);
         transaction1.add(statement2);
         transaction1.commit();
 
         //check if the nodes were inserted
-        Transaction transaction2 = client.getAtomicTransaction();
+        Transaction transaction2 = client.getTransaction();
 
-        Statement<RowSet> statement = new RowStatement("MATCH (n:Label) RETURN count(n) as number_of_nodes");
+        RowStatement statement = new RowStatement("MATCH (n:Label) RETURN count(n) as number_of_nodes");
         transaction2.add(statement);
         transaction2.commit();
 
@@ -94,18 +94,18 @@ public class EndToEndTests
     }
 
     @Test
-    public void testGraphCreationAndRetrieval() throws Neo4jClientException
+    public void testGraphCreationAndRetrieval()
     {
-        Transaction transaction1 = client.getAtomicTransaction();
+        Transaction transaction1 = client.getTransaction();
 
-        Statement<RowSet> statement1 = new RowStatement("MERGE (n1:Graph{id:\"id1\", prop1:\"property1\"})-[:connectedTo]-(n2:Graph{id:\"id2\", prop1:\"property2\"})");
+        RowStatement statement1 = new RowStatement("MERGE (n1:Graph{id:\"id1\", prop1:\"property1\"})-[:connectedTo]-(n2:Graph{id:\"id2\", prop1:\"property2\"})");
         transaction1.add(statement1);
         transaction1.commit();
 
         //check if the nodes were inserted
-        Transaction transaction2 = client.getAtomicTransaction();
+        Transaction transaction2 = client.getTransaction();
 
-        Statement<Graph> statement = new GraphStatement("MATCH (n:Graph)-[rels]-() RETURN rels");
+        GraphStatement statement = new GraphStatement("MATCH (n:Graph)-[rels]-() RETURN rels");
         transaction2.add(statement);
         transaction2.commit();
 
@@ -120,22 +120,20 @@ public class EndToEndTests
     }
 
     @Test
-    public void testBasicLongTransaction() throws Neo4jClientException
+    public void testBasicLongTransaction()
     {
-        Transaction transaction1 = client.getLongTransaction();
+        Transaction transaction1 = client.getTransaction();
 
         try
         {
-            transaction1.begin();
-
-            Statement<RowSet> statement1 = new RowStatement("MERGE (n1:Graph{id:\"id1\", prop1:\"property1\"})-[:connectedTo]-(n2:Graph{id:\"id2\", prop1:\"property2\"})");
-            Statement<RowSet> statement2 = new RowStatement("MERGE (n2:Graph{id:\"id3\", prop1:\"property3\"})");
+            RowStatement statement1 = new RowStatement("MERGE (n1:Graph{id:\"id1\", prop1:\"property1\"})-[:connectedTo]-(n2:Graph{id:\"id2\", prop1:\"property2\"})");
+            RowStatement statement2 = new RowStatement("MERGE (n2:Graph{id:\"id3\", prop1:\"property3\"})");
 
             transaction1.add(statement1);
             transaction1.add(statement2);
             transaction1.flush();
 
-            Statement<RowSet> statement3 = new RowStatement("MERGE (n2:Graph{id:\"id4\"}) SET n2 = {props}");
+            RowStatement statement3 = new RowStatement("MERGE (n2:Graph{id:\"id4\"}) SET n2 = {props}");
             Map<String, Object> props = new HashMap<>();
             props.put("id", "id4");
             props.put("prop1", "property4");
@@ -152,9 +150,9 @@ public class EndToEndTests
         }
 
         //check if the nodes were inserted
-        Transaction transaction2 = client.getAtomicTransaction();
+        Transaction transaction2 = client.getTransaction();
 
-        Statement<Graph> statement = new GraphStatement("MATCH (n:Graph) OPTIONAL MATCH (n)-[rels]-() RETURN n, rels");
+        GraphStatement statement = new GraphStatement("MATCH (n:Graph) OPTIONAL MATCH (n)-[rels]-() RETURN n, rels");
         transaction2.add(statement);
         transaction2.commit();
 
@@ -171,7 +169,7 @@ public class EndToEndTests
     }
 
     @Test
-    public void testMultipleThreadsInsertingCompoundStatements() throws InterruptedException, Neo4jClientException
+    public void testMultipleThreadsInsertingCompoundStatements() throws InterruptedException
     {
         ExecutorService service = Executors.newFixedThreadPool(10);
         CountDownLatch latch = new CountDownLatch(1000);
@@ -184,9 +182,9 @@ public class EndToEndTests
         latch.await();
 
         //check if the nodes were inserted
-        Transaction transaction2 = client.getAtomicTransaction();
+        Transaction transaction2 = client.getTransaction();
 
-        Statement<RowSet> statement = new RowStatement("MATCH (n:BulkInsert) RETURN count(n) as number_of_nodes");
+        RowStatement statement = new RowStatement("MATCH (n:BulkInsert) RETURN count(n) as number_of_nodes");
         transaction2.add(statement);
         transaction2.commit();
 
@@ -212,14 +210,14 @@ public class EndToEndTests
         @Override
         public void run()
         {
-            Transaction transaction = client.getAtomicTransaction();
+            Transaction transaction = client.getTransaction();
 
             try
             {
                 for (int i = 1; i <= 10; i++)
                 {
-                    Statement<RowSet> statement1 = new RowStatement("MERGE (n:BulkInsert{id:\"id" + id + i +
-                                                                    "\"})");
+                    RowStatement statement1 = new RowStatement("MERGE (n:BulkInsert{id:\"id" + id + i +
+                                                               "\"})");
                     transaction.add(statement1);
                 }
                 transaction.commit();

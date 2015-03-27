@@ -60,20 +60,15 @@ public class ExecutionResult
 
         for (int i = 0; i < dataLength; i++)
         {
-
             JSONObject datum = data.getJSONObject(i);
-
             JSONObject graph = datum.getJSONObject("graph");
-
             JSONArray nodes = graph.getJSONArray("nodes");
-
             int nodesLength = nodes.length();
 
             for (int j = 0; j < nodesLength; j++)
             {
                 JSONObject node = nodes.getJSONObject(j);
                 long id = node.getLong("id");
-
                 Node n = seenNodes.get(id);
 
                 if (n != null)
@@ -83,7 +78,6 @@ public class ExecutionResult
 
                 JSONArray labels = node.getJSONArray("labels");
                 int labelsLength = labels.length();
-
                 String[] ls = new String[labelsLength];
 
                 for (int k = 0; k < labelsLength; k++)
@@ -99,7 +93,6 @@ public class ExecutionResult
             }
 
             JSONArray relationships = graph.getJSONArray("relationships");
-
             int relationshipsLength = relationships.length();
 
             for (int j = 0; j < relationshipsLength; j++)

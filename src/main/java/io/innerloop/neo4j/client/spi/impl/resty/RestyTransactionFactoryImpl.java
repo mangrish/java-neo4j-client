@@ -13,8 +13,6 @@ public class RestyTransactionFactoryImpl implements TransactionFactory
 
     private final String baseUrl;
 
-    private final String autoCommitEndpointUrl;
-
     private final String transactionEndpointUrl;
 
     public RestyTransactionFactoryImpl(String url)
@@ -22,7 +20,6 @@ public class RestyTransactionFactoryImpl implements TransactionFactory
         this.client = new Resty();
         this.client.withHeader("X-Stream", "true");
         this.baseUrl = url.endsWith("/") ? url : url + "/";
-        this.autoCommitEndpointUrl = this.baseUrl + "transaction/commit";
         this.transactionEndpointUrl = this.baseUrl + "transaction";
     }
 
@@ -33,15 +30,9 @@ public class RestyTransactionFactoryImpl implements TransactionFactory
     }
 
     @Override
-    public Transaction getAtomicTransaction()
+    public Transaction getTransaction()
     {
-        return new RestyAtomicTransactionImpl(client, autoCommitEndpointUrl);
-    }
-
-    @Override
-    public Transaction getLongTransaction()
-    {
-        return RestyLongTransactionImpl.getTransaction(client, transactionEndpointUrl);
+        return RestyTransactionImpl.getTransaction(client, transactionEndpointUrl);
     }
 
 }
