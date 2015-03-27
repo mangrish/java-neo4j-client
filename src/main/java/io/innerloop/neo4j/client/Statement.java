@@ -10,7 +10,7 @@ import java.util.Map;
  * Neo4J supports two forms fo Statement Requests: Graphs and Rows.
  * <p>
  * Unlike JDBC in which statements are created from a connection, the Neo4J Driver actually allows developers to create
- * as many statements as they like on a single transaction (supported through the Transaction#add(Statement) method).
+ * as many statements as they like on a single transaction (supported through the Connection#add(Statement) method).
  * <p>
  * Results are also specific to the statement and can be retrieved via the #getResult() method.
  * <p>

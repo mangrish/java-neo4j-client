@@ -45,12 +45,13 @@ You will only need one of these instances per application. This object is thread
 If you are dealing with a password protected Neo4J instance there is an overloaded constructor that will serve you.
 
 
-## Create a Transaction and add some Statements
+## Create a Connection and add some Statements
 
-java-neo4j-driver Transactions are a little like JDBC Connections and Transactions merged together.
+java-neo4j-driver Connections are a little like JDBC Connections and Transactions merged together.
 
 All Neo4J Queries must run within a Neo4J Transaction.  This driver allows batches of statements to be 
-flushed to the database intermittently before being committed. It also provides the capability to rollback Transactions.
+flushed to the database intermittently before being committed. It also provides the capability to rollback Transactions
+on a connection.
 
 Statements also come in two flavours:
 
@@ -68,20 +69,20 @@ RowSets are just stripped down versions of the JDBC ResultSet. You can iterate t
 
 ### Example
 
-And here is an example of using a Long Transaction:
+And here is an example of using a Transaction:
 
 ```java
 Neo4jClient client = new Neo4jClient("http://localhost:7474/db/data");
 
-Transaction transaction = client.getTransaction(); // gets the active transaction on this Thread.
+Connection connection = client.getConnection(); // gets the active connection on this Thread.
 try
 {
     RowStatement statement1 = new RowStatement("MERGE (n1:Graph{id:\"id1\", prop1:\"property1\"})-[:connectedTo]-(n2:Graph{id:\"id2\", prop1:\"property2\"})");
     RowStatement statement2 = new RowStatement("MERGE (n2:Graph{id:\"id3\", prop1:\"property3\"})");
 
-    transaction.add(statement1);
-    transaction.add(statement2);
-    transaction.flush(); // this will execute any statements that have already appeared. Writes are isolated to this Transaction as "Read Uncommitted" Isolation.
+    connection.add(statement1);
+    connection.add(statement2);
+    connection.flush(); // this will execute any statements that have already appeared. Writes are isolated to this Transaction as "Read Committed" Isolation.
 
     RowStatement statement3 = new RowStatement("MERGE (n2:Graph{id:\"id4\"}) SET n2 = {props}");
     Map<String, Object> props = new HashMap<>();
@@ -90,17 +91,17 @@ try
     props.put("random", 213);
     statement3.setParam("props", props);
 
-    transaction.add(statement3);
-    transaction.commit();
+    connection.add(statement3);
+    connection.commit();
 }
 catch (Neo4jClientException e) // Optionally catch the RuntimeException to rollback.
 {
-    transaction1.rollback();
+    connection1.rollback();
 }
 
 ```
 
-This is a more complicated example. It shows 2 statements being created and flushed to the database. If another transaction
+This is a more complicated example. It shows 2 statements being created and flushed to the database. If another connection
 tried to read the written data at this stage it would not be visible to them (until commit() is called).
 
 This example also shows how you can insert a whole node just using a Map and placeholder replacement in the query.
@@ -135,17 +136,17 @@ Return a graph and how many nodes are labelled with a certain Label.
 ```java
 Neo4jClient client = new Neo4jClient("http://localhost:7474/db/data");
 
-Transaction transaction = client.getTransaction();
+Connection connection = client.getConnection();
 
 GraphStatement statement1 = new GraphStatement("MATCH (n:Label{uuid:{uuid}})-[rels]-() RETURN n, rels")
 statement1.addParam("uuid", "abcd1234");
 
 RowStatement statement2 = new RowStatement("MATCH (n:Label) RETURN count(n)")
 
-transaction.add(statement1);
-transaction.add(statement2);
+connection.add(statement1);
+connection.add(statement2);
 
-transaction.commit();
+connection.commit();
 
 Graph graph = statement1.getResult(); // Do your Graph stuff here!
 RowSet rowSet = statement2.getResult();

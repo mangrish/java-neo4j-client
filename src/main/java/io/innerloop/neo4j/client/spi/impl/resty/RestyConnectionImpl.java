@@ -1,5 +1,6 @@
 package io.innerloop.neo4j.client.spi.impl.resty;
 
+import io.innerloop.neo4j.client.Connection;
 import io.innerloop.neo4j.client.Graph;
 import io.innerloop.neo4j.client.GraphStatement;
 import io.innerloop.neo4j.client.Neo4jClientException;
@@ -8,7 +9,6 @@ import io.innerloop.neo4j.client.Neo4jServerMultiException;
 import io.innerloop.neo4j.client.RowSet;
 import io.innerloop.neo4j.client.RowStatement;
 import io.innerloop.neo4j.client.Statement;
-import io.innerloop.neo4j.client.Transaction;
 import io.innerloop.neo4j.client.json.JSONObject;
 import io.innerloop.neo4j.client.spi.impl.resty.web.JSONResource;
 import io.innerloop.neo4j.client.spi.impl.resty.web.Resty;
@@ -26,28 +26,28 @@ import static io.innerloop.neo4j.client.spi.impl.resty.web.Resty.delete;
 /**
  * Created by markangrish on 12/12/2014.
  */
-public class RestyTransactionImpl implements Transaction
+public class RestyConnectionImpl implements Connection
 {
     private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z");
 
-    private static ThreadLocal<RestyTransactionImpl> transactionHolder = new ThreadLocal<>();
+    private static ThreadLocal<RestyConnectionImpl> connectionHolder = new ThreadLocal<>();
 
-    public static Transaction getTransaction(Resty client, String transactionEndpointUrl)
+    public static Connection getConnection(Resty client, String transactionEndpointUrl)
     {
-        RestyTransactionImpl transaction = transactionHolder.get();
+        RestyConnectionImpl connection = connectionHolder.get();
 
-        if (transaction == null)
+        if (connection == null)
         {
-            transaction = new RestyTransactionImpl(client, transactionEndpointUrl);
-            transactionHolder.set(transaction);
+            connection = new RestyConnectionImpl(client, transactionEndpointUrl);
+            connectionHolder.set(connection);
         }
 
-        return transaction;
+        return connection;
     }
 
-    public static void closeTransaction()
+    public static void closeConnection()
     {
-        transactionHolder.remove();
+        connectionHolder.remove();
     }
 
     private final Resty client;
@@ -58,7 +58,7 @@ public class RestyTransactionImpl implements Transaction
 
     private LocalDateTime transactionExpires;
 
-    public RestyTransactionImpl(Resty client, String transactionEndpointUrl)
+    public RestyConnectionImpl(Resty client, String transactionEndpointUrl)
     {
         this.activeTransactionEndpointUrl = transactionEndpointUrl;
         this.statements = new ArrayList<>();
@@ -186,7 +186,7 @@ public class RestyTransactionImpl implements Transaction
 
     private void close()
     {
-        closeTransaction();
+        closeConnection();
     }
 
     void checkErrors(Neo4jServerException[] exceptions)

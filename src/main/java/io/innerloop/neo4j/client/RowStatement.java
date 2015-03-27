@@ -22,9 +22,9 @@ public class RowStatement extends Statement
     }
 
     /**
-     * Retrieves the result of this Statement. Only accessible after Transaction#commit() has been called.
+     * Retrieves the result of this Statement. Only accessible after Connection#commit() has been called.
      *
-     * @return The result of the execution of this statement if available. If called before Transaction#commit(), null
+     * @return The result of the execution of this statement if available. If called before Connection#commit(), null
      * is returned.
      */
     public RowSet getResult()

@@ -55,11 +55,11 @@ public class EndToEndTests
     @Test
     public void testSimpleQuery()
     {
-        Transaction transaction = client.getTransaction();
+        Connection connection = client.getConnection();
 
         RowStatement statement = new RowStatement("MATCH (n) RETURN count(n)");
-        transaction.add(statement);
-        transaction.commit();
+        connection.add(statement);
+        connection.commit();
 
         RowSet result = statement.getResult();
         assertNotNull(result);
@@ -71,20 +71,20 @@ public class EndToEndTests
     @Test
     public void testInsertCompoundStatements()
     {
-        Transaction transaction1 = client.getTransaction();
+        Connection connection1 = client.getConnection();
 
         RowStatement statement1 = new RowStatement("MERGE (n:Label{id:\"id1\", prop1:\"property1\"})");
         RowStatement statement2 = new RowStatement("MERGE (n:Label{id:\"id2\", prop1:\"property2\"})");
-        transaction1.add(statement1);
-        transaction1.add(statement2);
-        transaction1.commit();
+        connection1.add(statement1);
+        connection1.add(statement2);
+        connection1.commit();
 
         //check if the nodes were inserted
-        Transaction transaction2 = client.getTransaction();
+        Connection connection2 = client.getConnection();
 
         RowStatement statement = new RowStatement("MATCH (n:Label) RETURN count(n) as number_of_nodes");
-        transaction2.add(statement);
-        transaction2.commit();
+        connection2.add(statement);
+        connection2.commit();
 
         RowSet result = statement.getResult();
         assertNotNull(result);
@@ -96,18 +96,18 @@ public class EndToEndTests
     @Test
     public void testGraphCreationAndRetrieval()
     {
-        Transaction transaction1 = client.getTransaction();
+        Connection connection1 = client.getConnection();
 
         RowStatement statement1 = new RowStatement("MERGE (n1:Graph{id:\"id1\", prop1:\"property1\"})-[:connectedTo]-(n2:Graph{id:\"id2\", prop1:\"property2\"})");
-        transaction1.add(statement1);
-        transaction1.commit();
+        connection1.add(statement1);
+        connection1.commit();
 
         //check if the nodes were inserted
-        Transaction transaction2 = client.getTransaction();
+        Connection connection2 = client.getConnection();
 
         GraphStatement statement = new GraphStatement("MATCH (n:Graph)-[rels]-() RETURN rels");
-        transaction2.add(statement);
-        transaction2.commit();
+        connection2.add(statement);
+        connection2.commit();
 
         Graph result = statement.getResult();
         assertNotNull(result);
@@ -122,16 +122,16 @@ public class EndToEndTests
     @Test
     public void testBasicLongTransaction()
     {
-        Transaction transaction1 = client.getTransaction();
+        Connection connection1 = client.getConnection();
 
         try
         {
             RowStatement statement1 = new RowStatement("MERGE (n1:Graph{id:\"id1\", prop1:\"property1\"})-[:connectedTo]-(n2:Graph{id:\"id2\", prop1:\"property2\"})");
             RowStatement statement2 = new RowStatement("MERGE (n2:Graph{id:\"id3\", prop1:\"property3\"})");
 
-            transaction1.add(statement1);
-            transaction1.add(statement2);
-            transaction1.flush();
+            connection1.add(statement1);
+            connection1.add(statement2);
+            connection1.flush();
 
             RowStatement statement3 = new RowStatement("MERGE (n2:Graph{id:\"id4\"}) SET n2 = {props}");
             Map<String, Object> props = new HashMap<>();
@@ -140,21 +140,21 @@ public class EndToEndTests
             props.put("random", 213);
             statement3.setParam("props", props);
 
-            transaction1.add(statement3);
-            transaction1.commit();
+            connection1.add(statement3);
+            connection1.commit();
         }
         catch (Neo4jClientException e)
         {
-            transaction1.rollback();
+            connection1.rollback();
             fail("Should have been able to commit. Rolled back to keep DB consistent.");
         }
 
         //check if the nodes were inserted
-        Transaction transaction2 = client.getTransaction();
+        Connection connection2 = client.getConnection();
 
         GraphStatement statement = new GraphStatement("MATCH (n:Graph) OPTIONAL MATCH (n)-[rels]-() RETURN n, rels");
-        transaction2.add(statement);
-        transaction2.commit();
+        connection2.add(statement);
+        connection2.commit();
 
         Graph result = statement.getResult();
         assertNotNull(result);
@@ -182,11 +182,11 @@ public class EndToEndTests
         latch.await();
 
         //check if the nodes were inserted
-        Transaction transaction2 = client.getTransaction();
+        Connection connection2 = client.getConnection();
 
         RowStatement statement = new RowStatement("MATCH (n:BulkInsert) RETURN count(n) as number_of_nodes");
-        transaction2.add(statement);
-        transaction2.commit();
+        connection2.add(statement);
+        connection2.commit();
 
         RowSet result = statement.getResult();
         assertNotNull(result);
@@ -210,7 +210,7 @@ public class EndToEndTests
         @Override
         public void run()
         {
-            Transaction transaction = client.getTransaction();
+            Connection connection = client.getConnection();
 
             try
             {
@@ -218,9 +218,9 @@ public class EndToEndTests
                 {
                     RowStatement statement1 = new RowStatement("MERGE (n:BulkInsert{id:\"id" + id + i +
                                                                "\"})");
-                    transaction.add(statement1);
+                    connection.add(statement1);
                 }
-                transaction.commit();
+                connection.commit();
             }
             catch (Neo4jClientException e)
             {

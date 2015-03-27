@@ -1,7 +1,7 @@
 package io.innerloop.neo4j.client;
 
-import io.innerloop.neo4j.client.spi.TransactionFactory;
-import io.innerloop.neo4j.client.spi.impl.resty.RestyTransactionFactoryImpl;
+import io.innerloop.neo4j.client.spi.ConnectionFactory;
+import io.innerloop.neo4j.client.spi.impl.resty.RestyConnectionFactoryImpl;
 
 
 /**
@@ -11,7 +11,7 @@ import io.innerloop.neo4j.client.spi.impl.resty.RestyTransactionFactoryImpl;
  */
 public class Neo4jClient
 {
-    private TransactionFactory transactionFactory;
+    private ConnectionFactory connectionFactory;
 
     /**
      * Create a new Client.
@@ -22,7 +22,7 @@ public class Neo4jClient
      */
     public Neo4jClient(String url)
     {
-        this.transactionFactory = new RestyTransactionFactoryImpl(url);
+        this.connectionFactory = new RestyConnectionFactoryImpl(url);
     }
 
     /**
@@ -37,18 +37,16 @@ public class Neo4jClient
      */
     public Neo4jClient(String url, String userName, String password)
     {
-        this.transactionFactory = new RestyTransactionFactoryImpl(url, userName, password);
+        this.connectionFactory = new RestyConnectionFactoryImpl(url, userName, password);
     }
 
     /**
-     * Create a new Long Transaction or retrieve the existing one on the currently executing Thread.
-     * Unlike Atomic Transactions, Long Transactions make use of begin() and rollback() but come with a performance
-     * penalty when compared to Atomic Transactions.
+     * Create a new Connection or retrieve the existing one on the currently executing Thread.
      *
-     * @return A Long Transaction.
+     * @return A Connection.
      */
-    public Transaction getTransaction()
+    public Connection getConnection()
     {
-        return transactionFactory.getTransaction();
+        return connectionFactory.getConnection();
     }
 }
