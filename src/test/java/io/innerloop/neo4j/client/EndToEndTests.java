@@ -1,10 +1,15 @@
 package io.innerloop.neo4j.client;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.server.CommunityNeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -28,6 +33,14 @@ public class EndToEndTests
     private Neo4jClient client;
 
     private CommunityNeoServer server;
+
+    @BeforeClass
+    public static void oneTimeSetUp()
+    {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        Logger rootLogger = loggerContext.getLogger("io.innerloop.neo4j.client");
+        rootLogger.setLevel(Level.DEBUG);
+    }
 
     @Before
     public void setUp() throws IOException, InterruptedException

@@ -1,7 +1,7 @@
 package io.innerloop.neo4j.client;
 
 import io.innerloop.neo4j.client.spi.ConnectionFactory;
-import io.innerloop.neo4j.client.spi.impl.resty.RestyConnectionFactoryImpl;
+import io.innerloop.neo4j.client.spi.impl.rest.RestConnectionFactoryImpl;
 
 
 /**
@@ -22,7 +22,7 @@ public class Neo4jClient
      */
     public Neo4jClient(String url)
     {
-        this.connectionFactory = new RestyConnectionFactoryImpl(url);
+        this.connectionFactory = new RestConnectionFactoryImpl(url);
     }
 
     /**
@@ -37,7 +37,7 @@ public class Neo4jClient
      */
     public Neo4jClient(String url, String userName, String password)
     {
-        this.connectionFactory = new RestyConnectionFactoryImpl(url, userName, password);
+        this.connectionFactory = new RestConnectionFactoryImpl(url, userName, password);
     }
 
     /**

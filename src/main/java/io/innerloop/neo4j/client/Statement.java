@@ -1,7 +1,7 @@
 package io.innerloop.neo4j.client;
 
-import io.innerloop.neo4j.client.json.JSONArray;
-import io.innerloop.neo4j.client.json.JSONObject;
+import io.innerloop.neo4j.client.spi.impl.rest.json.JSONArray;
+import io.innerloop.neo4j.client.spi.impl.rest.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
