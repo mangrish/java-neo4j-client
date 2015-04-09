@@ -1,6 +1,6 @@
 package io.innerloop.neo4j.client;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -34,7 +34,7 @@ public interface Connection
      *
      * @return A date time specifying when this Connection will expire..
      */
-    LocalDateTime getExpiry();
+    OffsetDateTime getExpiry();
 
     /**
      * Extends the life of this Connection. Can be used in conjunction with getExpiry() in a daemon thread to

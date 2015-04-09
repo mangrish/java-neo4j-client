@@ -16,10 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 
@@ -30,7 +31,7 @@ public class RestConnectionImpl implements Connection
 {
     private static final Logger LOG = LoggerFactory.getLogger(RestConnectionImpl.class);
 
-    private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z");
+    private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z").withLocale(Locale.ENGLISH);
 
     private static ThreadLocal<RestConnectionImpl> connectionHolder = new ThreadLocal<>();
 
@@ -59,7 +60,7 @@ public class RestConnectionImpl implements Connection
 
     private String activeTransactionEndpointUrl;
 
-    private LocalDateTime transactionExpires;
+    private OffsetDateTime transactionExpires;
 
     public RestConnectionImpl(HttpClient client, String transactionEndpointUrl)
     {
@@ -82,7 +83,7 @@ public class RestConnectionImpl implements Connection
     }
 
     @Override
-    public LocalDateTime getExpiry()
+    public OffsetDateTime getExpiry()
     {
         return transactionExpires;
     }
@@ -96,7 +97,7 @@ public class RestConnectionImpl implements Connection
             LOG.debug("Flushing to [{}]", activeTransactionEndpointUrl);
             JSONObject jsonResult = execute(activeTransactionEndpointUrl);
             this.activeTransactionEndpointUrl = jsonResult.getString("commit").replace("/commit", "");
-            this.transactionExpires = LocalDateTime.parse(jsonResult.getJSONObject("transaction").getString("expires"),
+            this.transactionExpires = OffsetDateTime.parse(jsonResult.getJSONObject("transaction").getString("expires"),
                                                           FORMATTER);
             this.statements.clear();
             LOG.debug("Next endpoint is now: [{}] which expires at: [{}]",
@@ -152,7 +153,7 @@ public class RestConnectionImpl implements Connection
             ExecutionResult er = new ExecutionResult(jsonResult);
             checkErrors(er.getErrors());
             this.activeTransactionEndpointUrl = jsonResult.getString("commit").replace("/commit", "");
-            this.transactionExpires = LocalDateTime.parse(jsonResult.getJSONObject("transaction").getString("expires"),
+            this.transactionExpires = OffsetDateTime.parse(jsonResult.getJSONObject("transaction").getString("expires"),
                                                           FORMATTER);
         }
         catch (Exception e)
