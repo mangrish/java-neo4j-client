@@ -3,7 +3,6 @@ package io.innerloop.neo4j.client;
 import io.innerloop.neo4j.client.spi.impl.rest.json.JSONArray;
 import io.innerloop.neo4j.client.spi.impl.rest.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,29 +91,27 @@ public abstract class Statement
     {
         if (this == o)
             return true;
-        if (o == null || getClass() != o.getClass())
+
+        if (o == null)
             return false;
 
-        Statement statement1 = (Statement) o;
+        if (!(o instanceof Statement))
+        {
+            return false;
+        }
 
-        if (includeStats != statement1.includeStats)
-            return false;
-        if (!statement.equals(statement1.statement))
-            return false;
-        if (!parameters.equals(statement1.parameters))
-            return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(resultDataContents, statement1.resultDataContents);
+        Statement s = (Statement) o;
 
+        return s.statement.equals(statement) && s.parameters.equals(parameters) && s.resultDataContents[0].equals(resultDataContents[0]);
     }
 
     @Override
     public int hashCode()
     {
-        int result = statement.hashCode();
+        int result = 17;
+        result = 31 * result + statement.hashCode();
         result = 31 * result + parameters.hashCode();
-        result = 31 * result + Arrays.hashCode(resultDataContents);
-        result = 31 * result + (includeStats ? 1 : 0);
+        result = 31 * result + resultDataContents[0].hashCode();
         return result;
     }
 }

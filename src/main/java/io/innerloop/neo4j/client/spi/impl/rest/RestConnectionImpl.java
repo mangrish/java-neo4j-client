@@ -134,7 +134,7 @@ public class RestConnectionImpl implements Connection
         }
         finally
         {
-            LOG.debug("Successfully committed");
+            LOG.debug("Successfully committed. Closing connection.");
             close();
         }
     }
@@ -145,11 +145,11 @@ public class RestConnectionImpl implements Connection
         try
         {
             final JSONObject payload = new JSONObject().put("statements", new ArrayList<JSONObject>());
-            LOG.debug("Payload is: [{}]", payload.toString());
+            LOG.info("Executing [{}] statements.", statements.size());
+            LOG.debug("Statements are: [{}]", payload.toString());
             String result = client.post(activeTransactionEndpointUrl, payload);
             LOG.debug("Raw result is: [{}]", result);
             JSONObject jsonResult = new JSONObject(result);
-            LOG.debug("Json result is: [{}]", jsonResult);
             ExecutionResult er = new ExecutionResult(jsonResult);
             checkErrors(er.getErrors());
             this.activeTransactionEndpointUrl = jsonResult.getString("commit").replace("/commit", "");
@@ -168,11 +168,11 @@ public class RestConnectionImpl implements Connection
     {
         List<JSONObject> statements = this.statements.stream().map(Statement::toJson).collect(Collectors.toList());
         final JSONObject payload = new JSONObject().put("statements", (statements));
-        LOG.debug("Payload is: [{}]", payload.toString());
+        LOG.info("Executing [{}] statements.", statements.size());
+        LOG.debug("Statements are: [{}]", payload.toString());
         String result = client.post(endpointUrl, payload);
         LOG.debug("Raw result is: [{}]", result);
         JSONObject jsonResult = new JSONObject(result);
-        LOG.debug("Json result is: [{}]", jsonResult);
         ExecutionResult er = new ExecutionResult(jsonResult);
         checkErrors(er.getErrors());
         for (int i = 0; i < this.statements.size(); i++)

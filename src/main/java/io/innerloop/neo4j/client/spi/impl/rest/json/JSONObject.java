@@ -339,8 +339,9 @@ public class JSONObject {
     public JSONObject(String baseName, Locale locale) throws io.innerloop.neo4j.client.spi.impl.rest.json.JSONException
     {
         this();
-        ResourceBundle bundle = ResourceBundle.getBundle(baseName, locale,
-                Thread.currentThread().getContextClassLoader());
+        ResourceBundle bundle = ResourceBundle.getBundle(baseName,
+                                                         locale,
+                                                         Thread.currentThread().getContextClassLoader());
 
 // Iterate through the keys in the bundle.
 
@@ -1709,5 +1710,25 @@ public class JSONObject {
         } catch (IOException exception) {
             throw new JSONException(exception);
         }
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        JSONObject that = (JSONObject) o;
+
+        return !(map != null ? !map.equals(that.map) : that.map != null);
+
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return map != null ? map.hashCode() : 0;
     }
 }
