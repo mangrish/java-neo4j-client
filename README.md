@@ -116,7 +116,7 @@ statement3.setParam("userId", "a1b2c3d4");
 Map<String, Object> userProperties = new HashMap<>();
 userProperties.put("id", "a1b2c3d4");
 userProperties.put("email", "hello@kitty.com");
-userProperties.put("name", "Hello Kitty);
+userProperties.put("name", "Hello Kitty");
 statement3.setParam("user", new JSONObject(userProperties));
 connection.add(statement3);
 
