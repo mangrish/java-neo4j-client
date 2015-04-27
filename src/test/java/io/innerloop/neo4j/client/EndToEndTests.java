@@ -53,15 +53,20 @@ public class EndToEndTests
         while (!server.getDatabase().isRunning())
         {
             // It's ok to spin here.. it's not production code.
-            Thread.sleep(250);
+            Thread.sleep(100);
         }
         client = new Neo4jClient("http://localhost:" + port + "/db/data");
     }
 
     @After
-    public void tearDown()
+    public void tearDown() throws IOException, InterruptedException
     {
         server.stop();
+        while (server.getDatabase().isRunning())
+        {
+            // It's ok to spin here.. it's not production code.
+            Thread.sleep(100);
+        }
         client = null;
     }
 
