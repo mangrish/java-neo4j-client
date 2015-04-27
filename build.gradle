@@ -6,7 +6,8 @@ apply plugin: 'signing'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 group = "io.innerloop"
-version = "0.2.0"
+version = "0.3.0-SNAPSHOT"
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
@@ -43,6 +44,7 @@ artifacts {
 }
 
 signing {
+    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
 }
 
