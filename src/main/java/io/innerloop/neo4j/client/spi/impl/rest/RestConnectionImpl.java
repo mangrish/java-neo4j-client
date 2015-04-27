@@ -134,7 +134,7 @@ public class RestConnectionImpl implements Connection
         }
         finally
         {
-            LOG.debug("Successfully committed. Closing connection.");
+            LOG.debug("Closing connection.");
             close();
         }
     }
