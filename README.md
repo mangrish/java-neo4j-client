@@ -3,6 +3,8 @@ java-neo4j-client
 
 A compact Neo4J Java API for connecting to non embedded instances.
 
+[![Build Status](https://travis-ci.org/inner-loop/java-neo4j-client.svg?branch=master)](https://travis-ci.org/inner-loop/java-neo4j-client)
+
 # Features
 
 1. No 3rd party dependencies (except [SLF4J](http://www.slf4j.org/)).
