@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Java-neo4j-client by inner-loop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Java-neo4j-client</h1>
+      <h2 class="project-tagline">A compact Neo4J Java API for connecting to non embedded instances.</h2>
+      <a href="https://github.com/inner-loop/java-neo4j-client" class="btn">View on GitHub</a>
+      <a href="https://github.com/inner-loop/java-neo4j-client/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/inner-loop/java-neo4j-client/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="java-neo4j-client" class="anchor" href="#java-neo4j-client" aria-hidden="true"><span class="octicon octicon-link"></span></a>java-neo4j-client</h1>
+
+<p>A compact Neo4J Java API for connecting to non embedded instances.</p>
+
+<p><a href="https://travis-ci.org/inner-loop/java-neo4j-client"><img src="https://travis-ci.org/inner-loop/java-neo4j-client.svg?branch=master" alt="Build Status"></a></p>
+
+<h1>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h1>
+
+<ol>
+<li>No 3rd party dependencies (except <a href="http://www.slf4j.org/">SLF4J</a>).</li>
+<li>Very simple, Neo4J specific API that only uses Cypher, the Neo4J query language.</li>
+<li>Support for Graph and Row based result retrieval.</li>
+<li>Allows multiple queries per Transaction. Useful for batching or realising patterns like <a href="http://martinfowler.com/eaaCatalog/unitOfWork.html">Unit of Work</a>.</li>
+<li>Built to be used with the <a href="https://github.com/inner-loop/java-neo4j-ogm">Java Neo4J OGM</a>.</li>
+<li>Can be used as a placeholder API until the official Neo4J Binary Protocol Java driver is released.</li>
+</ol>
+
+<h1>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h1>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<p>This driver currently requires Java 8+.</p>
+
+<p>To install from Maven:</p>
+
+<pre lang="maven"><code>&lt;dependency&gt;
+    &lt;groupId&gt;io.innerloop&lt;/groupId&gt;
+    &lt;artifactId&gt;java-neo4j-client&lt;/artifactId&gt;
+    &lt;version&gt;0.2.0&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>To install from Gradle:</p>
+
+<div class="highlight highlight-gradle"><pre>compile <span class="pl-c1">group</span>: <span class="pl-s"><span class="pl-pds">'</span>io.innerloop<span class="pl-pds">'</span></span>, <span class="pl-c1">name</span>: <span class="pl-s"><span class="pl-pds">'</span>java-neo4j-client<span class="pl-pds">'</span></span>, <span class="pl-c1">version</span>: <span class="pl-s"><span class="pl-pds">'</span>0.2.0<span class="pl-pds">'</span></span></pre></div>
+
+<h2>
+<a id="initialise" class="anchor" href="#initialise" aria-hidden="true"><span class="octicon octicon-link"></span></a>Initialise</h2>
+
+<p>Initialise the driver like so:</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-smi">Neo4jClient</span> client <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">Neo4jClient</span>(<span class="pl-s"><span class="pl-pds">"</span>http://localhost:7474/db/data<span class="pl-pds">"</span></span>);</pre></div>
+
+<p>or with credentials:</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-smi">Neo4jClient</span> client <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">Neo4jClient</span>(<span class="pl-s"><span class="pl-pds">"</span>http://localhost:7474/db/data<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>);</pre></div>
+
+<p>You will only need one of these instances per application. This object is thread safe so feel free to share it.</p>
+
+<h2>
+<a id="connections-and-statements" class="anchor" href="#connections-and-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Connections and Statements.</h2>
+
+<p>java-neo4j-driver Connections are a little like JDBC Connections and Transactions merged together.</p>
+
+<p>All Neo4J Queries must run within a Neo4J Transaction.  This driver allows batches of statements to be 
+flushed to the database intermittently before being committed. It also provides the capability to rollback Transactions
+on a connection.</p>
+
+<p>Statements also come in two flavours:</p>
+
+<ol>
+<li>
+<em>Graph Statements</em>: Will return results in a graph format. Useful when you want to visualise your graph or map it to
+domain objects etc. It is important to remember that when performing Graph queries you will need to return relationships, not just the nodes!<br>
+For example: <code>MATCH (n:Node)-[r]-() RETURN n, COLLECT(r) AS r</code>
+</li>
+<li>
+<em>Row based Statements</em>: Will return results in a more JDBC familiar table format, with column names and rows of data.
+Useful if you want to get aggregate results or perform more relational type queries. This mode is useful when you want
+to extract tabular data from your Neo4J server. This method will return items back as RowSets. RowSets are just stripped
+down versions of the JDBC ResultSet. You can iterate through RowSets using the next() method.</li>
+</ol>
+
+<p>Statements also support parameter replacement. Simply use a placeholder in your cypher query like so: <code>{ placeholder }</code>. See 
+examples for more details.</p>
+
+<h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<h3>
+<a id="basic-example" class="anchor" href="#basic-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basic Example.</h3>
+
+<p>This example will use two existing items (A User and a Tweet) and connect them together. It will then
+retrieve all tweets tweeted by a user then flush them to the database, thus allowing us to see the results of 
+the call.</p>
+
+<p>We then do an update the user object itself before committing the result and getting the neo4j id of the user.</p>
+
+<p>It is worth noticing that when <code>flush()</code> is called, the transaction is still alive. It's important to not too
+too much data manipulation inside of the transactions otherwise it could time out.  If you anticipate a very long
+running transaction you may call the Connection.resetExpiry() method.</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-smi">Neo4jClient</span> client <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">Neo4jClient</span>(<span class="pl-s"><span class="pl-pds">"</span>http://localhost:7474/db/data<span class="pl-pds">"</span></span>);
+
+<span class="pl-smi">Connection</span> connection <span class="pl-k">=</span> client<span class="pl-k">.</span>getConnection(); <span class="pl-c">// gets the active connection on this Thread.</span>
+
+<span class="pl-smi">RowStatement</span> statement1 <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">RowStatement</span>(<span class="pl-s"><span class="pl-pds">"</span>MATCH (a:User{id:{0}}), (b:Tweet{id:{1}}) MERGE (a)-[:TWEETED]-(b)<span class="pl-pds">"</span></span>);
+statement1<span class="pl-k">.</span>setParam(<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>a1b2c3d4<span class="pl-pds">"</span></span>);
+statement1<span class="pl-k">.</span>setParam(<span class="pl-s"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>e5f6g7h8<span class="pl-pds">"</span></span>);
+connection<span class="pl-k">.</span>add(statement1);
+
+<span class="pl-smi">GraphStatement</span> statement2 <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">GraphStatement</span>(<span class="pl-s"><span class="pl-pds">"</span>MATCH (a:User{id:{userId}})-[r:TWEETED]-() RETURN a, COLLECT(r) AS r<span class="pl-pds">"</span></span>);
+statement2<span class="pl-k">.</span>setParam(<span class="pl-s"><span class="pl-pds">"</span>userId<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>a1b2c3d4<span class="pl-pds">"</span></span>);
+connection<span class="pl-k">.</span>add(statement2);
+
+<span class="pl-c">// this will execute any statements that have already appeared. Writes are isolated </span>
+<span class="pl-c">// to this Transaction as "Read Committed" Isolation.</span>
+connection<span class="pl-k">.</span>flush(); 
+
+<span class="pl-smi">Graph</span> userTweets <span class="pl-k">=</span> statement2<span class="pl-k">.</span>getResult();
+
+<span class="pl-c">// Do something with the user tweets..</span>
+<span class="pl-c">// Set&lt;Node&gt; nodes = userTweets.getNodes();</span>
+<span class="pl-c">// Set&lt;Relationship&gt; relationships = userTweets.getRelationships();</span>
+
+
+<span class="pl-smi">RowStatement</span> statement3 <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">RowStatement</span>(<span class="pl-s"><span class="pl-pds">"</span>MATCH (a:User{id:{userId}}) SET a = {user} RETURN id(a)<span class="pl-pds">"</span></span>);
+statement3<span class="pl-k">.</span>setParam(<span class="pl-s"><span class="pl-pds">"</span>userId<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>a1b2c3d4<span class="pl-pds">"</span></span>);
+<span class="pl-k">Map&lt;<span class="pl-smi">String</span>, <span class="pl-smi">Object</span>&gt;</span> userProperties <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">HashMap&lt;&gt;</span>();
+userProperties<span class="pl-k">.</span>put(<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>a1b2c3d4<span class="pl-pds">"</span></span>);
+userProperties<span class="pl-k">.</span>put(<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>hello@kitty.com<span class="pl-pds">"</span></span>);
+userProperties<span class="pl-k">.</span>put(<span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Hello Kitty<span class="pl-pds">"</span></span>);
+statement3<span class="pl-k">.</span>setParam(<span class="pl-s"><span class="pl-pds">"</span>user<span class="pl-pds">"</span></span>, <span class="pl-k">new</span> <span class="pl-smi">JSONObject</span>(userProperties));
+connection<span class="pl-k">.</span>add(statement3);
+
+<span class="pl-c">// Finally commit the whole thing to the database. and check out the user id.</span>
+connection<span class="pl-k">.</span>commit();
+
+<span class="pl-k">long</span> userNeo4jId <span class="pl-k">=</span> statement3<span class="pl-k">.</span>getResult()<span class="pl-k">.</span>getLong(<span class="pl-c1">0</span>);</pre></div>
+
+<h1>
+<a id="why-another-driver" class="anchor" href="#why-another-driver" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why another Driver?</h1>
+
+<p>There are a few Java Neo4J Drivers out there, the two most used being the neo4j-rest-binding, a relic from the Neo4J 1.x
+days and the much newer neo4j-jdbc-driver. Neo4j are also working on a binary protocol with a corresponding Java driver.
+This project is meant to be the bridge between that newer driver and what is already available. I hope it's API and
+call semantics are similar to what the binary/native Java driver API and call semantics will look like.</p>
+
+<p>As much as the jdbc driver is a big move forward, it suffers from some major issues:</p>
+
+<ol>
+<li>It shoehorns the power of Neo4J's unique graph ability into a relational databases model which just doesn't fit that
+nicely with the Graph world.</li>
+<li>The Neo4J jdbc driver does also not support Neo4J's "graph" mode. Graph mode massively reduces the response payload and
+it allows users to store and retrieve object graphs, natively. This is so amazing but cannot be done with the JDBC driver AT ALL.</li>
+<li>It's not lightweight. Users get to add a tonne of dependencies that may conflict with their own dependencies.</li>
+</ol>
+
+<p>I wanted something that allows me to query Neo4J in the form that makes it so powerful: the graph; but still have the ability
+to fall back on row querying when i needed it. Think of this driver as the Java equivalent of of the Neo4j Web Browser.</p>
+
+<p>The API deliberately steers clear of JDBC conventions as Neo4J's usage is different enough that trying to make it play
+with that style is more work than it's worth.</p>
+
+<p>This driver is specifically intended to work with the <a href="https://github.com/inner-loop/java-neo4j-ogm">Java Neo4J OGM</a>.</p>
+
+<h1>
+<a id="roadmap" class="anchor" href="#roadmap" aria-hidden="true"><span class="octicon octicon-link"></span></a>Roadmap</h1>
+
+<h2>
+<a id="03x" class="anchor" href="#03x" aria-hidden="true"><span class="octicon octicon-link"></span></a>0.3.x</h2>
+
+<ul>
+<li>Add performance tests.</li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/inner-loop/java-neo4j-client">Java-neo4j-client</a> is maintained by <a href="https://github.com/inner-loop">inner-loop</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
