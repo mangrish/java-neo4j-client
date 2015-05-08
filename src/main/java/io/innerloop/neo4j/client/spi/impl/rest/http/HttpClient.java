@@ -39,7 +39,13 @@ public class HttpClient
 
     public String delete(String endpoint) throws IOException
     {
-        Response httpResponse = new Request(endpoint).deleteResource();
+        Request request = new Request(endpoint);
+        for (Map.Entry<String, String> entry : headers.entrySet())
+        {
+            request.addHeader(entry.getKey(), entry.getValue());
+        }
+        Response httpResponse = request.deleteResource();
+
         return httpResponse.getBody();
     }
 
