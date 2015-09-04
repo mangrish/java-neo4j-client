@@ -26,14 +26,14 @@ To install from Maven:
 <dependency>
     <groupId>io.innerloop</groupId>
     <artifactId>java-neo4j-client</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
 To install from Gradle:
 
 ```gradle
-compile group: 'io.innerloop', name: 'java-neo4j-client', version: '0.2.0'
+compile group: 'io.innerloop', name: 'java-neo4j-client', version: '0.3.0'
 ```
 
 ## Initialise
