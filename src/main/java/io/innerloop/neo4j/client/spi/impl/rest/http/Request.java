@@ -2,6 +2,7 @@ package io.innerloop.neo4j.client.spi.impl.rest.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -95,11 +96,16 @@ public class Request extends Message<Request>
      */
     public Response getResource() throws IOException
     {
+        return actionResponse("GET");
+    }
+
+    private Response actionResponse(String get) throws IOException
+    {
         buildQueryString();
         buildHeaders();
 
         connection.setDoOutput(true);
-        connection.setRequestMethod("GET");
+        connection.setRequestMethod(get);
 
         return readResponse();
     }
@@ -137,13 +143,7 @@ public class Request extends Message<Request>
      */
     public Response deleteResource() throws IOException
     {
-        buildQueryString();
-        buildHeaders();
-
-        connection.setDoOutput(true);
-        connection.setRequestMethod("DELETE");
-
-        return readResponse();
+        return actionResponse("DELETE");
     }
 
     /**
@@ -168,6 +168,7 @@ public class Request extends Message<Request>
 
         writer = new OutputStreamWriter(connection.getOutputStream());
         writer.write(body);
+        writer.flush();
         writer.close();
 
         return readResponse();
@@ -182,7 +183,13 @@ public class Request extends Message<Request>
      */
     private Response readResponse() throws IOException
     {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        connection.getResponseCode();
+        InputStream stream = connection.getErrorStream();
+        if (stream == null) {
+            stream = connection.getInputStream();
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
         StringBuilder builder = new StringBuilder();
         String line;
