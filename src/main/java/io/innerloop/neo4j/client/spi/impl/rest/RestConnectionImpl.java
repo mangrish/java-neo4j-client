@@ -96,7 +96,16 @@ public class RestConnectionImpl implements Connection
         {
             LOG.debug("Flushing to [{}]", activeTransactionEndpointUrl);
             JSONObject jsonResult = execute(activeTransactionEndpointUrl);
-            this.activeTransactionEndpointUrl = jsonResult.getString("commit").replace("/commit", "");
+            ///////////////////////////////////////////////////////////////////////
+            // I found that Neo4J sometimes fails to find the transaction Id we send him in activeTransactionEndpointUrl.
+            // And returns FileNotFoundException.
+            // So if we don't send him the transaction it will create new one every time we call it.
+            // This fix puts the responsibility of transaction maintenance on Neo4J and not this util.
+            // One transaction per call.
+            int beginIndex = jsonResult.getString("commit").indexOf("transaction/");
+            int endIndex = jsonResult.getString("commit").indexOf("/commit")+"/commit".length();
+            this.activeTransactionEndpointUrl = jsonResult.getString("commit").replace(jsonResult.getString("commit").subSequence(beginIndex, endIndex), "transaction");
+            ///////////////////////////////////////////////////////////////////////
             this.transactionExpires = OffsetDateTime.parse(jsonResult.getJSONObject("transaction").getString("expires"),
                                                           FORMATTER);
             this.statements.clear();
