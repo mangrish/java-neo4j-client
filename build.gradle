@@ -6,6 +6,7 @@ apply plugin: 'signing'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 group = "io.innerloop"
+archivesBaseName = "java-neo4j-client"
 version = "0.4.0"
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
@@ -56,15 +57,15 @@ uploadArchives {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: System.getProperty('nexusUsername'), password: System.getProperty('nexusPassword'))
+                authentication(userName: ossrhUsername, password: ossrhPassword)
             }
 
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: System.getProperty('nexusUsername'), password: System.getProperty('nexusPassword'))
+                authentication(userName: ossrhUsername, password: ossrhPassword)
             }
 
             pom.project {
-                name project.name
+                name 'Java Neo4j Client'
                 packaging 'jar'
                 description 'A compact Java driver that supports graph formats for standalone Neo4J instances.'
                 url 'https://github.com/inner-loop/java-neo4j-client'
