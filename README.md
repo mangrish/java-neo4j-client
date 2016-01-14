@@ -33,7 +33,7 @@ To install from Maven:
 To install from Gradle:
 
 ```gradle
-compile group: 'io.innerloop', name: 'java-neo4j-client', version: '0.3.0'
+compile group: 'io.innerloop', name: 'java-neo4j-client', version: '0.4.0'
 ```
 
 ## Initialise
