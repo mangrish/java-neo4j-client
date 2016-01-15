@@ -13,3 +13,4 @@ build/
 *.ipr
 *.iws
 .DS_Store
+.gradletasknamecache
