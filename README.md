@@ -1,6 +1,8 @@
 java-neo4j-client
 =================
 
+***NOTE: This project is no longer actively developed supported. I recommend users switch to [the official Neo4j driver](https://github.com/neo4j/neo4j-java-driver).***
+
 A compact Neo4J Java API for connecting to non embedded instances.
 
 [![Build Status](https://travis-ci.org/inner-loop/java-neo4j-client.svg?branch=master)](https://travis-ci.org/inner-loop/java-neo4j-client)
