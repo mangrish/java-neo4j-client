@@ -1,7 +1,9 @@
 java-neo4j-client
 =================
 
-***NOTE: This project is no longer actively developed supported. I recommend users switch to [the official Neo4j driver](https://github.com/neo4j/neo4j-java-driver).***
+***Update: I will be reactivating this project due to some demand for those wanting a simple Java API. Next release will be early Jan '17***
+
+***NOTE: If you want a BOLT version of this project, I recommend you check out [the official Neo4j driver](https://github.com/neo4j/neo4j-java-driver).***
 
 A compact Neo4J Java API for connecting to non embedded instances.
 
@@ -13,8 +15,7 @@ A compact Neo4J Java API for connecting to non embedded instances.
 1. Very simple, Neo4J specific API that only uses Cypher, the Neo4J query language.
 1. Support for Graph and Row based result retrieval.
 1. Allows multiple queries per Transaction. Useful for batching or realising patterns like [Unit of Work](http://martinfowler.com/eaaCatalog/unitOfWork.html).
-1. Built to be used with the [Java Neo4J OGM](https://github.com/inner-loop/java-neo4j-ogm).
-1. Can be used as a placeholder API until the official Neo4J Binary Protocol Java driver is released.
+1. Built to be used with the [Java Neo4J OGM (currently on hold)](https://github.com/inner-loop/java-neo4j-ogm).
 
 # Usage
 
